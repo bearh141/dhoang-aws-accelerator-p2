@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>W8 Challenge — AWS Architecture Diagram</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Amazon Ember', Arial, sans-serif;
+      background: #f8f9fa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #232f3e;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #687078;
+      margin-bottom: 20px;
+    }
+    .diagram-wrap {
+      background: #fff;
+      border: 1px solid #d5dbdb;
+      border-radius: 4px;
+      padding: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      overflow: auto;
+    }
+    svg text {
+      font-family: 'Inter', 'Amazon Ember', Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+<h1>W8 Challenge — Terraform 1-Click Deploy K8s on AWS</h1>
+<p class="subtitle">Architecture Diagram · Region: ap-southeast-1 · Managed by Terraform</p>
+
+<div class="diagram-wrap">
+<svg width="1160" height="900" viewBox="0 0 1160 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrow markers -->
+    <marker id="arrow-black" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#232f3e"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#879196"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#ff9900"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#7b42bc"/>
+    </marker>
+
+    <!-- Icon shadow -->
+    <filter id="icon-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  USERS                                                      -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <g transform="translate(440, 18)">
+    <!-- 3 user figures -->
+    <g transform="translate(0,0)">
+      <circle cx="20" cy="10" r="7" fill="none" stroke="#232f3e" stroke-width="2"/>
+      <path d="M8,28 Q20,20 32,28" stroke="#232f3e" stroke-width="2" fill="none"/>
+    </g>
+    <g transform="translate(22,0)">
+      <circle cx="20" cy="10" r="7" fill="none" stroke="#232f3e" stroke-width="2"/>
+      <path d="M8,28 Q20,20 32,28" stroke="#232f3e" stroke-width="2" fill="none"/>
+    </g>
+    <g transform="translate(44,0)">
+      <circle cx="20" cy="10" r="7" fill="none" stroke="#232f3e" stroke-width="2"/>
+      <path d="M8,28 Q20,20 32,28" stroke="#232f3e" stroke-width="2" fill="none"/>
+    </g>
+    <text x="42" y="48" text-anchor="middle" font-size="12" font-weight="700" fill="#232f3e">Users</text>
+  </g>
+
+  <!-- Arrow: Users → ALB -->
+  <line x1="482" y1="70" x2="482" y2="260" stroke="#232f3e" stroke-width="2" marker-end="url(#arrow-black)"/>
+  <rect x="490" y="150" width="60" height="18" rx="2" fill="#fff" stroke="none"/>
+  <text x="520" y="164" text-anchor="middle" font-size="10" font-weight="600" fill="#232f3e">HTTP :80</text>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  TERRAFORM (outside AWS Cloud)                              -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <g transform="translate(30, 30)" filter="url(#icon-shadow)">
+    <rect width="52" height="52" rx="6" fill="#7B42BC"/>
+    <text x="26" y="22" text-anchor="middle" fill="#fff" font-size="9" font-weight="800">TERA</text>
+    <text x="26" y="35" text-anchor="middle" fill="#fff" font-size="9" font-weight="800">FORM</text>
+    <text x="26" y="70" text-anchor="middle" font-size="11" font-weight="700" fill="#232f3e">Terraform</text>
+    <text x="26" y="84" text-anchor="middle" font-size="9" font-weight="400" fill="#687078">IaC</text>
+  </g>
+
+  <!-- Arrow: Terraform → AWS Cloud -->
+  <path d="M88,56 L160,56 L160,105" fill="none" stroke="#7B42BC" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arrow-purple)"/>
+  <text x="127" y="48" text-anchor="middle" font-size="9" font-weight="600" fill="#7B42BC">provisions</text>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  AWS CLOUD                                                  -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <rect x="110" y="100" width="1020" height="780" rx="0" fill="none" stroke="#232f3e" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <!-- AWS Cloud label -->
+  <g transform="translate(118, 106)">
+    <rect width="16" height="16" rx="2" fill="#232f3e"/>
+    <text x="5" y="12" font-size="8" font-weight="700" fill="#fff">aws</text>
+    <text x="22" y="13" font-size="12" font-weight="700" fill="#232f3e">AWS Cloud</text>
+  </g>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  REGION                                                     -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <rect x="140" y="130" width="960" height="730" rx="0" fill="none" stroke="#147eba" stroke-width="1.5" stroke-dasharray="6 3"/>
+  <g transform="translate(148, 136)">
+    <rect width="14" height="14" rx="2" fill="#147eba"/>
+    <text x="4" y="11" font-size="7" font-weight="700" fill="#fff">R</text>
+    <text x="20" y="12" font-size="11" font-weight="600" fill="#147eba">Region: ap-southeast-1</text>
+  </g>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  VPC                                                        -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <rect x="170" y="165" width="780" height="680" rx="0" fill="none" stroke="#8C4FFF" stroke-width="1.5" stroke-dasharray="6 3"/>
+  <g transform="translate(178, 171)">
+    <rect width="14" height="14" rx="2" fill="#8C4FFF"/>
+    <text x="4" y="11" font-size="7" font-weight="700" fill="#fff">V</text>
+    <text x="20" y="12" font-size="11" font-weight="600" fill="#8C4FFF">VPC (Default)</text>
+  </g>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  AVAILABILITY ZONE                                          -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <rect x="200" y="195" width="720" height="635" rx="0" fill="none" stroke="#147eba" stroke-width="1" stroke-dasharray="4 3"/>
+  <g transform="translate(208, 201)">
+    <text x="0" y="11" font-size="11" font-weight="600" fill="#147eba">Availability Zone (AZ-a)</text>
+  </g>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  PUBLIC SUBNET (ALB lives here)                             -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <rect x="230" y="225" width="660" height="120" rx="0" fill="rgba(27,102,15,0.04)" stroke="#1A8A12" stroke-width="1" stroke-dasharray="4 3"/>
+  <g transform="translate(238, 231)">
+    <rect width="12" height="12" rx="2" fill="#1A8A12"/>
+    <text x="18" y="11" font-size="10" font-weight="600" fill="#1A8A12">Public Subnet</text>
+  </g>
+
+  <!-- ──────── Internet Gateway ──────── -->
+  <g transform="translate(290, 252)" filter="url(#icon-shadow)">
+    <rect width="50" height="50" rx="6" fill="#8C4FFF"/>
+    <!-- IGW icon: vertical bar with arrows -->
+    <line x1="25" y1="10" x2="25" y2="40" stroke="#fff" stroke-width="2.5"/>
+    <path d="M16,20 L25,12 L34,20" stroke="#fff" stroke-width="2" fill="none"/>
+    <path d="M16,30 L25,38 L34,30" stroke="#fff" stroke-width="2" fill="none"/>
+    <text x="25" y="66" text-anchor="middle" font-size="10" font-weight="600" fill="#232f3e">IGW</text>
+  </g>
+
+  <!-- Arrow: IGW → ALB -->
+  <line x1="345" y1="277" x2="420" y2="277" stroke="#232f3e" stroke-width="2" marker-end="url(#arrow-black)"/>
+
+  <!-- ──────── ALB ──────── -->
+  <g transform="translate(425, 248)" filter="url(#icon-shadow)">
+    <rect width="56" height="56" rx="6" fill="#8C4FFF"/>
+    <!-- ALB icon: simplified ELB -->
+    <circle cx="28" cy="20" r="10" fill="none" stroke="#fff" stroke-width="2"/>
+    <text x="28" y="24" text-anchor="middle" font-size="8" font-weight="800" fill="#fff">ALB</text>
+    <circle cx="14" cy="40" r="5" fill="none" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="28" cy="40" r="5" fill="none" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="42" cy="40" r="5" fill="none" stroke="#fff" stroke-width="1.5"/>
+    <text x="28" y="72" text-anchor="middle" font-size="10" font-weight="600" fill="#232f3e">ALB</text>
+    <text x="28" y="85" text-anchor="middle" font-size="9" font-weight="400" fill="#687078">HTTP :80</text>
+  </g>
+
+  <!-- ──────── ALB Security Group ──────── -->
+  <g transform="translate(550, 253)" filter="url(#icon-shadow)">
+    <rect width="48" height="48" rx="6" fill="#DD344C"/>
+    <!-- Shield icon -->
+    <path d="M24,10 L36,16 L36,28 Q36,38 24,42 Q12,38 12,28 L12,16 Z" fill="none" stroke="#fff" stroke-width="2"/>
+    <text x="24" y="60" text-anchor="middle" font-size="9" font-weight="600" fill="#232f3e">ALB SG</text>
+    <text x="24" y="72" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">In: :80</text>
+  </g>
+
+  <!-- Arrow: ALB → EC2 (down) -->
+  <line x1="453" y1="340" x2="453" y2="400" stroke="#232f3e" stroke-width="2" marker-end="url(#arrow-black)"/>
+  <rect x="460" y="360" width="85" height="18" rx="2" fill="#fff"/>
+  <text x="502" y="374" text-anchor="middle" font-size="10" font-weight="600" fill="#232f3e">TG → :30080</text>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  PUBLIC SUBNET 2 (EC2 lives here)                           -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <rect x="230" y="395" width="660" height="425" rx="0" fill="rgba(27,102,15,0.03)" stroke="#1A8A12" stroke-width="1" stroke-dasharray="4 3"/>
+  <g transform="translate(238, 401)">
+    <rect width="12" height="12" rx="2" fill="#1A8A12"/>
+    <text x="18" y="11" font-size="10" font-weight="600" fill="#1A8A12">Public Subnet (EC2)</text>
+  </g>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  EC2 INSTANCE BOX                                           -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <rect x="265" y="425" width="600" height="380" rx="4" fill="rgba(255,153,0,0.03)" stroke="#FF9900" stroke-width="2"/>
+
+  <!-- EC2 icon -->
+  <g transform="translate(280, 435)" filter="url(#icon-shadow)">
+    <rect width="52" height="52" rx="6" fill="#FF9900"/>
+    <!-- EC2 server icon -->
+    <rect x="14" y="8" width="24" height="8" rx="2" fill="#fff"/>
+    <rect x="14" y="20" width="24" height="8" rx="2" fill="#fff"/>
+    <rect x="14" y="32" width="24" height="8" rx="2" fill="#fff"/>
+    <circle cx="33" cy="12" r="2" fill="#FF9900"/>
+    <circle cx="33" cy="24" r="2" fill="#FF9900"/>
+    <circle cx="33" cy="36" r="2" fill="#FF9900"/>
+  </g>
+  <text x="306" y="502" text-anchor="middle" font-size="11" font-weight="700" fill="#232f3e">EC2</text>
+  <text x="306" y="516" text-anchor="middle" font-size="9" font-weight="400" fill="#687078">t3.small</text>
+  <text x="306" y="530" text-anchor="middle" font-size="8" font-weight="400" fill="#879196">Ubuntu 22.04</text>
+  <text x="306" y="543" text-anchor="middle" font-size="8" font-weight="400" fill="#879196">20GB gp3</text>
+
+  <!-- EC2 SG icon -->
+  <g transform="translate(280, 555)" filter="url(#icon-shadow)">
+    <rect width="48" height="48" rx="6" fill="#DD344C"/>
+    <path d="M24,10 L36,16 L36,28 Q36,38 24,42 Q12,38 12,28 L12,16 Z" fill="none" stroke="#fff" stroke-width="2"/>
+    <text x="24" y="60" text-anchor="middle" font-size="9" font-weight="600" fill="#232f3e">EC2 SG</text>
+    <text x="24" y="72" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">In: ALB→:30080</text>
+    <text x="24" y="83" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">SSH :22</text>
+  </g>
+
+  <!-- ──────── Docker Engine ──────── -->
+  <g transform="translate(280, 660)" filter="url(#icon-shadow)">
+    <rect width="52" height="52" rx="6" fill="#2496ED"/>
+    <!-- Docker whale -->
+    <rect x="12" y="24" width="28" height="16" rx="3" fill="#fff"/>
+    <!-- containers on whale -->
+    <rect x="14" y="16" width="6" height="6" rx="1" fill="#fff"/>
+    <rect x="22" y="16" width="6" height="6" rx="1" fill="#fff"/>
+    <rect x="30" y="16" width="6" height="6" rx="1" fill="#fff"/>
+    <rect x="14" y="26" width="6" height="5" rx="1" fill="#2496ED"/>
+    <rect x="22" y="26" width="6" height="5" rx="1" fill="#2496ED"/>
+    <rect x="30" y="26" width="6" height="5" rx="1" fill="#2496ED"/>
+    <text x="26" y="68" text-anchor="middle" font-size="10" font-weight="600" fill="#232f3e">Docker</text>
+    <text x="26" y="80" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">Build Image</text>
+  </g>
+
+  <!-- Arrow: Docker → minikube (image load) -->
+  <path d="M338,686 L405,686" fill="none" stroke="#232f3e" stroke-width="1.5" marker-end="url(#arrow-black)"/>
+  <text x="370" y="678" text-anchor="middle" font-size="8" font-weight="500" fill="#687078">image load</text>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  MINIKUBE / KUBERNETES CLUSTER                              -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <rect x="400" y="435" width="440" height="355" rx="4" fill="rgba(50,108,229,0.03)" stroke="#326CE5" stroke-width="2" stroke-dasharray="6 3"/>
+  <!-- K8s icon -->
+  <g transform="translate(408, 440)">
+    <rect width="16" height="16" rx="3" fill="#326CE5"/>
+    <text x="8" y="12" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">⎈</text>
+    <text x="22" y="13" font-size="11" font-weight="700" fill="#326CE5">minikube (Kubernetes Cluster)</text>
+  </g>
+
+  <!-- ──────── Service NodePort ──────── -->
+  <g transform="translate(440, 470)" filter="url(#icon-shadow)">
+    <rect width="50" height="50" rx="6" fill="#326CE5"/>
+    <!-- Service icon: circle with arrows -->
+    <circle cx="25" cy="25" r="12" fill="none" stroke="#fff" stroke-width="2"/>
+    <path d="M25,13 L25,8" stroke="#fff" stroke-width="2"/>
+    <path d="M25,37 L25,42" stroke="#fff" stroke-width="2"/>
+    <path d="M13,25 L8,25" stroke="#fff" stroke-width="2"/>
+    <path d="M37,25 L42,25" stroke="#fff" stroke-width="2"/>
+    <text x="25" y="66" text-anchor="middle" font-size="9" font-weight="600" fill="#232f3e">Service</text>
+    <text x="25" y="78" text-anchor="middle" font-size="8" font-weight="500" fill="#326CE5">NodePort</text>
+    <text x="25" y="90" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">:30080</text>
+  </g>
+
+  <!-- ──────── HPA ──────── -->
+  <g transform="translate(650, 470)" filter="url(#icon-shadow)">
+    <rect width="50" height="50" rx="6" fill="#8C4FFF"/>
+    <!-- HPA icon: arrows scaling -->
+    <path d="M15,35 L25,15 L35,35" fill="none" stroke="#fff" stroke-width="2"/>
+    <line x1="12" y1="35" x2="38" y2="35" stroke="#fff" stroke-width="2"/>
+    <path d="M20,28 L15,33" stroke="#fff" stroke-width="1.5"/>
+    <path d="M30,28 L35,33" stroke="#fff" stroke-width="1.5"/>
+    <text x="25" y="66" text-anchor="middle" font-size="9" font-weight="600" fill="#232f3e">HPA</text>
+    <text x="25" y="78" text-anchor="middle" font-size="8" font-weight="500" fill="#8C4FFF">Autoscaler</text>
+    <text x="25" y="90" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">CPU 70%</text>
+    <text x="25" y="100" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">2→5 pods</text>
+  </g>
+
+  <!-- Arrow: HPA → Deployment (scale) -->
+  <path d="M675,575 L610,600" fill="none" stroke="#8C4FFF" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow-purple)"/>
+  <text x="650" y="592" text-anchor="middle" font-size="8" font-weight="600" fill="#8C4FFF">scale</text>
+
+  <!-- Arrow: Service → Deployment -->
+  <line x1="465" y1="565" x2="465" y2="600" fill="none" stroke="#232f3e" stroke-width="1.5" marker-end="url(#arrow-black)"/>
+
+  <!-- ──────── Deployment ──────── -->
+  <rect x="420" y="605" width="400" height="170" rx="4" fill="rgba(50,108,229,0.03)" stroke="#326CE5" stroke-width="1" stroke-dasharray="4 2"/>
+  <g transform="translate(428, 610)">
+    <rect width="14" height="14" rx="2" fill="#326CE5"/>
+    <text x="8" y="11" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">D</text>
+    <text x="20" y="12" font-size="10" font-weight="700" fill="#326CE5">Deployment: restaurant-web</text>
+    <text x="20" y="25" font-size="8" font-weight="400" fill="#687078">replicas: 2 · image: w8-k8s-challenge-web:local</text>
+  </g>
+
+  <!-- ──── Pod 1 ──── -->
+  <g transform="translate(435, 645)" filter="url(#icon-shadow)">
+    <rect width="105" height="115" rx="6" fill="#fff" stroke="#326CE5" stroke-width="1.5"/>
+    <!-- Pod icon -->
+    <g transform="translate(28, 8)">
+      <rect width="48" height="48" rx="6" fill="#326CE5"/>
+      <!-- Pod hexagon simplified -->
+      <polygon points="24,6 38,14 38,30 24,38 10,30 10,14" fill="none" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="24" cy="22" r="6" fill="#fff"/>
+    </g>
+    <text x="52" y="72" text-anchor="middle" font-size="10" font-weight="700" fill="#232f3e">Pod 1</text>
+    <text x="52" y="85" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">nginx:1.27-alpine</text>
+    <text x="52" y="97" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">Container :80</text>
+    <text x="52" y="109" text-anchor="middle" font-size="8" font-weight="500" fill="#1A8A12">/healthz ✓</text>
+  </g>
+
+  <!-- ──── Pod 2 ──── -->
+  <g transform="translate(555, 645)" filter="url(#icon-shadow)">
+    <rect width="105" height="115" rx="6" fill="#fff" stroke="#326CE5" stroke-width="1.5"/>
+    <g transform="translate(28, 8)">
+      <rect width="48" height="48" rx="6" fill="#326CE5"/>
+      <polygon points="24,6 38,14 38,30 24,38 10,30 10,14" fill="none" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="24" cy="22" r="6" fill="#fff"/>
+    </g>
+    <text x="52" y="72" text-anchor="middle" font-size="10" font-weight="700" fill="#232f3e">Pod 2</text>
+    <text x="52" y="85" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">nginx:1.27-alpine</text>
+    <text x="52" y="97" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">Container :80</text>
+    <text x="52" y="109" text-anchor="middle" font-size="8" font-weight="500" fill="#1A8A12">/healthz ✓</text>
+  </g>
+
+  <!-- ──── Pod 3-5 (HPA scaled, dashed) ──── -->
+  <g transform="translate(675, 645)">
+    <rect width="105" height="115" rx="6" fill="#fff" stroke="#8C4FFF" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <g transform="translate(28, 8)">
+      <rect width="48" height="48" rx="6" fill="#8C4FFF" opacity="0.7"/>
+      <polygon points="24,6 38,14 38,30 24,38 10,30 10,14" fill="none" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="24" cy="22" r="6" fill="#fff"/>
+    </g>
+    <text x="52" y="72" text-anchor="middle" font-size="10" font-weight="700" fill="#8C4FFF">Pod 3–5</text>
+    <text x="52" y="85" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">HPA scaled</text>
+    <text x="52" y="97" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">when CPU</text>
+    <text x="52" y="109" text-anchor="middle" font-size="8" font-weight="500" fill="#8C4FFF">&gt; 70%</text>
+  </g>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  KEY PAIR (outside VPC, inside Region)                      -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <g transform="translate(985, 200)" filter="url(#icon-shadow)">
+    <rect width="52" height="52" rx="6" fill="#DD344C"/>
+    <!-- Key icon -->
+    <circle cx="20" cy="20" r="8" fill="none" stroke="#fff" stroke-width="2"/>
+    <line x1="28" y1="20" x2="42" y2="20" stroke="#fff" stroke-width="2"/>
+    <line x1="36" y1="20" x2="36" y2="28" stroke="#fff" stroke-width="1.5"/>
+    <line x1="42" y1="20" x2="42" y2="28" stroke="#fff" stroke-width="1.5"/>
+    <text x="26" y="68" text-anchor="middle" font-size="9" font-weight="600" fill="#232f3e">Key Pair</text>
+    <text x="26" y="80" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">SSH .pem</text>
+  </g>
+
+  <!-- Arrow: Key Pair → EC2 -->
+  <path d="M1005,258 L1005,630 L870,630" fill="none" stroke="#687078" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow-gray)"/>
+  <text x="1015" y="450" font-size="8" font-weight="500" fill="#687078" transform="rotate(90,1015,450)">SSH access</text>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  TARGET GROUP (between ALB and EC2)                         -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <g transform="translate(580, 365)" filter="url(#icon-shadow)">
+    <rect width="48" height="48" rx="6" fill="#8C4FFF"/>
+    <!-- Target icon: crosshair -->
+    <circle cx="24" cy="24" r="10" fill="none" stroke="#fff" stroke-width="2"/>
+    <circle cx="24" cy="24" r="4" fill="#fff"/>
+    <line x1="24" y1="10" x2="24" y2="16" stroke="#fff" stroke-width="1.5"/>
+    <line x1="24" y1="32" x2="24" y2="38" stroke="#fff" stroke-width="1.5"/>
+    <line x1="10" y1="24" x2="16" y2="24" stroke="#fff" stroke-width="1.5"/>
+    <line x1="32" y1="24" x2="38" y2="24" stroke="#fff" stroke-width="1.5"/>
+  </g>
+  <text x="604" y="427" text-anchor="middle" font-size="9" font-weight="600" fill="#232f3e">Target Group</text>
+  <text x="604" y="439" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">Port :30080</text>
+  <text x="604" y="451" text-anchor="middle" font-size="8" font-weight="400" fill="#687078">Health: /healthz</text>
+
+  <!-- Arrow: ALB → Target Group -->
+  <line x1="487" y1="310" x2="597" y2="365" stroke="#232f3e" stroke-width="1.5" marker-end="url(#arrow-black)"/>
+
+  <!-- Arrow: Target Group → EC2 NodePort -->
+  <path d="M604,420 L465,470" fill="none" stroke="#232f3e" stroke-width="1.5" marker-end="url(#arrow-black)"/>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  user-data.sh (bootstrap label)                             -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <g transform="translate(985, 440)" filter="url(#icon-shadow)">
+    <rect width="80" height="65" rx="6" fill="#fff" stroke="#232f3e" stroke-width="1"/>
+    <rect x="0" y="0" width="80" height="18" rx="6" fill="#232f3e"/>
+    <text x="40" y="13" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">user-data.sh</text>
+    <text x="40" y="32" text-anchor="middle" font-size="7" font-weight="400" fill="#687078">Install Docker</text>
+    <text x="40" y="42" text-anchor="middle" font-size="7" font-weight="400" fill="#687078">Install kubectl</text>
+    <text x="40" y="52" text-anchor="middle" font-size="7" font-weight="400" fill="#687078">Start minikube</text>
+    <text x="40" y="62" text-anchor="middle" font-size="7" font-weight="400" fill="#687078">Deploy K8s app</text>
+  </g>
+
+  <!-- Arrow: user-data → EC2 -->
+  <path d="M985,472 L870,472" fill="none" stroke="#687078" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow-gray)"/>
+  <text x="928" y="464" text-anchor="middle" font-size="8" font-weight="500" fill="#687078">bootstrap</text>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  LABELS INSIDE EC2 BOX                                      -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <text x="855" y="443" text-anchor="end" font-size="10" font-weight="600" fill="#FF9900">EC2 Instance</text>
+  <text x="855" y="456" text-anchor="end" font-size="8" font-weight="400" fill="#687078">t3.small · 2vCPU · 2GB · Ubuntu 22.04</text>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  TRAFFIC FLOW LEGEND (bottom right)                         -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <g transform="translate(985, 570)">
+    <rect width="130" height="185" rx="6" fill="#fff" stroke="#d5dbdb" stroke-width="1"/>
+    <text x="65" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="#232f3e">Legend</text>
+    <line x1="8" y1="24" x2="122" y2="24" stroke="#d5dbdb" stroke-width="1"/>
+
+    <!-- AWS Cloud -->
+    <line x1="12" y1="38" x2="36" y2="38" stroke="#232f3e" stroke-width="1.5" stroke-dasharray="6 3"/>
+    <text x="42" y="42" font-size="8" font-weight="500" fill="#232f3e">AWS Cloud</text>
+
+    <!-- Region -->
+    <line x1="12" y1="56" x2="36" y2="56" stroke="#147eba" stroke-width="1.5" stroke-dasharray="5 3"/>
+    <text x="42" y="60" font-size="8" font-weight="500" fill="#147eba">Region</text>
+
+    <!-- VPC -->
+    <line x1="12" y1="74" x2="36" y2="74" stroke="#8C4FFF" stroke-width="1.5" stroke-dasharray="5 3"/>
+    <text x="42" y="78" font-size="8" font-weight="500" fill="#8C4FFF">VPC</text>
+
+    <!-- Subnet -->
+    <rect x="12" y="86" width="24" height="12" rx="1" fill="rgba(26,138,18,0.1)" stroke="#1A8A12" stroke-width="1" stroke-dasharray="3 2"/>
+    <text x="42" y="96" font-size="8" font-weight="500" fill="#1A8A12">Subnet</text>
+
+    <!-- EC2 -->
+    <rect x="12" y="104" width="24" height="12" rx="1" fill="rgba(255,153,0,0.08)" stroke="#FF9900" stroke-width="1.5"/>
+    <text x="42" y="114" font-size="8" font-weight="500" fill="#FF9900">EC2 Instance</text>
+
+    <!-- K8s -->
+    <rect x="12" y="122" width="24" height="12" rx="1" fill="rgba(50,108,229,0.08)" stroke="#326CE5" stroke-width="1.5" stroke-dasharray="4 2"/>
+    <text x="42" y="132" font-size="8" font-weight="500" fill="#326CE5">Kubernetes</text>
+
+    <!-- Security Group -->
+    <rect x="14" y="140" width="20" height="14" rx="3" fill="#DD344C"/>
+    <text x="42" y="152" font-size="8" font-weight="500" fill="#DD344C">Security Group</text>
+
+    <!-- Traffic -->
+    <line x1="12" y1="168" x2="36" y2="168" stroke="#232f3e" stroke-width="2" marker-end="url(#arrow-black)"/>
+    <text x="42" y="172" font-size="8" font-weight="500" fill="#232f3e">Traffic Flow</text>
+  </g>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!--  FLOW SUMMARY BOX (bottom)                                  -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <g transform="translate(170, 860)">
+    <text x="0" y="0" font-size="10" font-weight="600" fill="#232f3e">
+      Flow: User → ALB :80 → Target Group → EC2 :30080 → K8s NodePort Service → Pod (nginx :80)
+    </text>
+  </g>
+
+</svg>
+</div>
+
+</body>
+</html>
