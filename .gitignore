@@ -7,3 +7,4 @@ crash.*.log
 *.tfplan
 tfplan*
 *.pem
+cloud/w8/lab/challenge/app/dist/
