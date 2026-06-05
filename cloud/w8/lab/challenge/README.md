@@ -1,14 +1,14 @@
-# W8 Kubernetes on AWS - Terraform 1-Click Deploy
+# W8 Kubernetes trên AWS - Terraform 1-Click Deploy
 
-Deploy a lightweight Nginx web app to a Kubernetes cluster running on an EC2 instance, then expose it publicly through an AWS Application Load Balancer.
+Triển khai một ứng dụng web Nginx nhẹ lên Kubernetes cluster chạy trên EC2 instance, sau đó public ứng dụng ra Internet thông qua AWS Application Load Balancer.
 
-The goal of this project is to demonstrate a simple end-to-end DevOps workflow:
+Mục tiêu của project này là mô phỏng một quy trình DevOps end-to-end đơn giản:
 
 ```text
 Terraform -> AWS infrastructure -> EC2 bootstrap -> Docker image -> Kubernetes workload -> ALB public access
 ```
 
-## Architecture
+## Kiến trúc
 
 ```text
 User Browser
@@ -20,23 +20,23 @@ User Browser
   -> Nginx Pods :80
 ```
 
-Main components:
+Các thành phần chính:
 
-- `Terraform`: provisions AWS infrastructure.
-- `EC2`: runs Docker and minikube.
-- `Docker`: builds the local web image.
-- `minikube`: runs a single-node Kubernetes cluster on EC2.
-- `Deployment`: keeps the web app running with 2 replicas.
-- `Service`: exposes the app through NodePort `30080`.
-- `HPA`: scales the Deployment from 2 to 5 Pods based on CPU.
-- `ALB`: exposes the app to the Internet through a public DNS name.
+* `Terraform`: tạo và quản lý hạ tầng AWS.
+* `EC2`: chạy Docker và minikube.
+* `Docker`: build local web image.
+* `minikube`: chạy một Kubernetes cluster single-node trên EC2.
+* `Deployment`: đảm bảo web app luôn chạy với 2 replicas.
+* `Service`: expose app thông qua NodePort `30080`.
+* `HPA`: tự động scale Deployment từ 2 đến 5 Pods dựa trên CPU.
+* `ALB`: expose app ra Internet thông qua public DNS name.
 
-Architecture diagrams:
+Các sơ đồ kiến trúc:
 
-- `aws-k8s-challenge.drawio`
-- `aws-k8s-challenge-aws-style.drawio`
+* `aws-k8s-challenge.drawio`
+* `aws-k8s-challenge-aws-style.drawio`
 
-## Repository Structure
+## Cấu trúc Repository
 
 ```text
 challenge/
@@ -60,49 +60,49 @@ challenge/
     user-data.sh
 ```
 
-## What Gets Created
+## Những tài nguyên được tạo
 
-Terraform creates:
+Terraform sẽ tạo:
 
-- EC2 instance
-- Application Load Balancer
-- ALB Listener on HTTP port `80`
-- Target Group pointing to EC2 port `30080`
-- Security Groups
-- AWS Key Pair
-- Local SSH private key file
+* EC2 instance
+* Application Load Balancer
+* ALB Listener trên HTTP port `80`
+* Target Group trỏ đến EC2 port `30080`
+* Security Groups
+* AWS Key Pair
+* File SSH private key ở local
 
-The EC2 `user_data` script installs and configures:
+Script EC2 `user_data` sẽ cài đặt và cấu hình:
 
-- Docker Engine
-- kubectl
-- minikube
-- Nginx static web app
-- Kubernetes Deployment, Service, and HPA
+* Docker Engine
+* kubectl
+* minikube
+* Nginx static web app
+* Kubernetes Deployment, Service và HPA
 
-## Prerequisites
+## Điều kiện cần có
 
-Install and configure:
+Cài đặt và cấu hình:
 
-- Terraform `>= 1.6`
-- AWS CLI
-- An AWS account with permission to create EC2, ALB, Security Groups, and Key Pairs
+* Terraform `>= 1.6`
+* AWS CLI
+* AWS account có quyền tạo EC2, ALB, Security Groups và Key Pairs
 
-Configure AWS credentials:
+Cấu hình AWS credentials:
 
 ```powershell
 aws configure
 ```
 
-Verify the active account:
+Kiểm tra account AWS đang sử dụng:
 
 ```powershell
 aws sts get-caller-identity
 ```
 
-## Quick Start
+## Chạy nhanh
 
-From the Terraform directory:
+Đi đến thư mục Terraform:
 
 ```powershell
 cd D:\Download\AWS\Học\cloud\cloud\w8\lab\challenge\terraform
@@ -112,58 +112,58 @@ terraform plan -out=tfplan
 terraform apply tfplan
 ```
 
-Get the application URL:
+Lấy URL của ứng dụng:
 
 ```powershell
 terraform output alb_dns_name
 ```
 
-Open the output URL in a browser.
+Mở URL output trên trình duyệt.
 
-## Configuration
+## Cấu hình
 
-Main variables are defined in `terraform/variables.tf`.
+Các biến chính được định nghĩa trong file `terraform/variables.tf`.
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `aws_region` | `ap-southeast-1` | AWS region for the deployment |
-| `project_name` | `w8-k8s-challenge` | Prefix for AWS resource names |
-| `instance_type` | `t3.small` | EC2 instance type |
-| `ssh_cidr` | `0.0.0.0/0` | CIDR allowed to SSH into EC2 |
-| `node_port` | `30080` | Kubernetes NodePort targeted by ALB |
+| Variable        | Default            | Mô tả                                 |
+| --------------- | ------------------ | ------------------------------------- |
+| `aws_region`    | `ap-southeast-1`   | AWS region dùng để deploy             |
+| `project_name`  | `w8-k8s-challenge` | Prefix cho tên các AWS resource       |
+| `instance_type` | `t3.small`         | Loại EC2 instance                     |
+| `ssh_cidr`      | `0.0.0.0/0`        | CIDR được phép SSH vào EC2            |
+| `node_port`     | `30080`            | Kubernetes NodePort mà ALB sẽ trỏ tới |
 
-Recommended security improvement:
+Khuyến nghị cải thiện bảo mật:
 
 ```hcl
 ssh_cidr = "YOUR_PUBLIC_IP/32"
 ```
 
-For a lab environment, `0.0.0.0/0` is convenient but less secure.
+Trong môi trường lab, `0.0.0.0/0` tiện hơn nhưng kém an toàn hơn.
 
-## How It Works
+## Cách hoạt động
 
-1. Terraform selects the default VPC, default subnets, and latest Ubuntu 22.04 AMI.
-2. Terraform creates the ALB, Target Group, Listener, Security Groups, Key Pair, and EC2 instance.
-3. EC2 runs `terraform/user-data.sh` on first boot.
-4. `user-data.sh` installs Docker, kubectl, and minikube.
-5. The script writes the app files and Kubernetes manifests into `/opt/w8-challenge`.
-6. Docker builds the image `w8-k8s-challenge-web:local`.
-7. minikube starts with Docker driver and publishes port `30080`.
-8. The image is loaded into minikube.
-9. Kubernetes applies Deployment, Service, and HPA.
-10. ALB forwards public HTTP traffic to EC2 port `30080`.
+1. Terraform lấy default VPC, default subnets và Ubuntu 22.04 AMI mới nhất.
+2. Terraform tạo ALB, Target Group, Listener, Security Groups, Key Pair và EC2 instance.
+3. EC2 chạy script `terraform/user-data.sh` trong lần boot đầu tiên.
+4. `user-data.sh` cài Docker, kubectl và minikube.
+5. Script ghi các file app và Kubernetes manifests vào `/opt/w8-challenge`.
+6. Docker build image `w8-k8s-challenge-web:local`.
+7. minikube khởi động với Docker driver và publish port `30080`.
+8. Image được load vào minikube.
+9. Kubernetes apply Deployment, Service và HPA.
+10. ALB forward public HTTP traffic đến EC2 port `30080`.
 
-Important minikube command:
+Lệnh minikube quan trọng:
 
 ```bash
 minikube start --driver=docker --force --cpus=2 --memory=1800mb --ports=${node_port}:${node_port}
 ```
 
-The `--ports=30080:30080` mapping is required because minikube runs inside Docker. It allows ALB traffic to reach the Kubernetes NodePort.
+Phần mapping `--ports=30080:30080` là bắt buộc vì minikube chạy bên trong Docker. Nó cho phép traffic từ ALB đi vào Kubernetes NodePort.
 
-## Application
+## Ứng dụng
 
-The app is a static HTML page served by Nginx.
+App là một trang HTML tĩnh được serve bằng Nginx.
 
 `app/Dockerfile`:
 
@@ -176,7 +176,7 @@ COPY index.html /usr/share/nginx/html/index.html
 EXPOSE 80
 ```
 
-`app/nginx.conf` includes a health check endpoint:
+`app/nginx.conf` có health check endpoint:
 
 ```nginx
 location /healthz {
@@ -186,43 +186,43 @@ location /healthz {
 }
 ```
 
-The ALB Target Group and Kubernetes probes use `/healthz`.
+ALB Target Group và Kubernetes probes đều sử dụng `/healthz`.
 
 ## Kubernetes Resources
 
 `k8s/deployment.yaml`
 
-- Runs `restaurant-web`.
-- Uses 2 replicas.
-- Defines CPU and memory requests/limits.
-- Uses readiness and liveness probes on `/healthz`.
+* Chạy `restaurant-web`.
+* Sử dụng 2 replicas.
+* Định nghĩa CPU và memory requests/limits.
+* Sử dụng readiness probe và liveness probe tại `/healthz`.
 
 `k8s/service.yaml`
 
-- Exposes the app as `NodePort`.
-- Uses `nodePort: 30080`.
-- Routes traffic to container port `80`.
+* Expose app dưới dạng `NodePort`.
+* Sử dụng `nodePort: 30080`.
+* Route traffic đến container port `80`.
 
 `k8s/hpa.yaml`
 
-- Scales the Deployment from 2 to 5 replicas.
-- Uses CPU target utilization of 70%.
+* Scale Deployment từ 2 đến 5 replicas.
+* Sử dụng CPU target utilization là 70%.
 
-## Verification
+## Kiểm tra
 
-Check Terraform outputs:
+Kiểm tra Terraform outputs:
 
 ```powershell
 terraform output
 ```
 
-Check the ALB URL:
+Kiểm tra ALB URL:
 
 ```powershell
 terraform output alb_dns_name
 ```
 
-Check Target Group health:
+Kiểm tra trạng thái Target Group:
 
 ```powershell
 aws elbv2 describe-target-health `
@@ -230,13 +230,13 @@ aws elbv2 describe-target-health `
   --region ap-southeast-1
 ```
 
-SSH into EC2:
+SSH vào EC2:
 
 ```powershell
 ssh -i .\w8-k8s-challenge.pem ubuntu@<ec2-public-ip>
 ```
 
-If Windows rejects the key permission:
+Nếu Windows báo lỗi quyền của key:
 
 ```powershell
 $me = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
@@ -244,7 +244,7 @@ icacls .\w8-k8s-challenge.pem /inheritance:r
 icacls .\w8-k8s-challenge.pem /grant:r "$($me):R"
 ```
 
-Check Kubernetes from EC2:
+Kiểm tra Kubernetes từ EC2:
 
 ```bash
 sudo kubectl get nodes
@@ -253,27 +253,27 @@ sudo curl http://127.0.0.1:30080/healthz
 sudo cat /opt/w8-challenge/evidence.txt
 ```
 
-Expected health check result:
+Kết quả health check mong đợi:
 
 ```text
 ok
 ```
 
-## Troubleshooting
+## Xử lý lỗi
 
-View EC2 bootstrap logs:
+Xem log bootstrap của EC2:
 
 ```bash
 sudo tail -n 100 /var/log/cloud-init-output.log
 ```
 
-Check minikube:
+Kiểm tra minikube:
 
 ```bash
 sudo minikube status
 ```
 
-Check Kubernetes workload:
+Kiểm tra Kubernetes workload:
 
 ```bash
 sudo kubectl get pods -o wide
@@ -282,38 +282,37 @@ sudo kubectl logs <pod-name>
 sudo kubectl get svc
 ```
 
-If ALB returns `502 Bad Gateway`, check:
+Nếu ALB trả về lỗi `502 Bad Gateway`, hãy kiểm tra:
 
-1. Target Group health status.
-2. EC2 Security Group allows traffic from ALB SG to port `30080`.
-3. minikube is running.
-4. Service `restaurant-web` exposes NodePort `30080`.
-5. Pods are `Running` and readiness probes pass.
-6. `curl http://127.0.0.1:30080/healthz` returns `ok`.
+1. Trạng thái health của Target Group.
+2. Security Group của EC2 có cho phép traffic từ ALB SG vào port `30080` không.
+3. minikube có đang chạy không.
+4. Service `restaurant-web` có expose NodePort `30080` không.
+5. Pods có ở trạng thái `Running` và readiness probes có pass không.
+6. Lệnh `curl http://127.0.0.1:30080/healthz` có trả về `ok` không.
 
 ## Evidence Checklist
 
-Capture these screenshots for submission:
+Cần chụp các ảnh sau để nộp bài:
 
-- Browser opens the app through ALB DNS.
-- Target Group target is `healthy`.
-- ALB Listener `HTTP :80` forwards to the Target Group.
-- EC2 instance is running with type `t3.small`.
-- `terraform output`.
-- `kubectl get deploy,rs,pods,svc,hpa -o wide`.
-- `curl http://127.0.0.1:30080/healthz` returns `ok`.
+* Browser mở được app thông qua ALB DNS.
+* Target trong Target Group ở trạng thái `healthy`.
+* ALB Listener `HTTP :80` forward đến Target Group.
+* EC2 instance đang chạy với type `t3.small`.
+* Kết quả `terraform output`.
+* Kết quả `kubectl get deploy,rs,pods,svc,hpa -o wide`.
+* Kết quả `curl http://127.0.0.1:30080/healthz` trả về `ok`.
 
 ## Cleanup
 
-Destroy AWS resources after the demo to avoid cost:
+Xóa AWS resources sau khi demo để tránh phát sinh chi phí:
 
 ```powershell
-cd D:\Download\AWS\Học\cloud\cloud\w8\lab\challenge\terraform
 terraform destroy
 ```
 
-## Notes
+## Ghi chú
 
-- This project is designed for a lab challenge, not production.
-- For production, prefer EKS, ECR, HTTPS with ACM, private subnets, stricter SSH access, and remote Terraform state with S3/DynamoDB.
-- Do not commit `.pem`, `.tfstate`, `.tfvars`, `.terraform/`, or `tfplan*` files.
+* Project này được thiết kế cho lab challenge, không phải môi trường production.
+* Với production, nên dùng EKS, ECR, HTTPS với ACM, private subnets, giới hạn SSH chặt hơn, và remote Terraform state với S3/DynamoDB.
+* Không commit các file `.pem`, `.tfstate`, `.tfvars`, `.terraform/`, hoặc `tfplan*`.
