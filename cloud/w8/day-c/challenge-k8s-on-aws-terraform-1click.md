@@ -60,7 +60,7 @@ Lý do chọn app nhỏ:
 App nằm ở:
 
 ```text
-cloud/w8/day-c/challenge/app/
+cloud/w8/lab/challenge/app/
 ```
 
 File chính:
@@ -253,7 +253,7 @@ kết hợp Kubernetes provider/Helm/GitOps thay vì minikube trên EC2.
 Đề xuất tạo trong repo học:
 
 ```text
-cloud/w8/day-c/challenge/
+cloud/w8/lab/challenge/
   README.md
   terraform/
     versions.tf
@@ -281,7 +281,7 @@ cloud/w8/day-c/challenge/
 Tạo:
 
 ```text
-cloud/w8/day-c/challenge/app/Dockerfile
+cloud/w8/lab/challenge/app/Dockerfile
 ```
 
 Nội dung:
@@ -324,7 +324,7 @@ Ghi chú container lắng nghe port 80. `EXPOSE` không tự mở port ra host; 
 Tạo:
 
 ```text
-cloud/w8/day-c/challenge/app/nginx.conf
+cloud/w8/lab/challenge/app/nginx.conf
 ```
 
 Nội dung:
@@ -383,7 +383,7 @@ Endpoint health check cho Kubernetes probes và ALB Target Group. ALB gọi `/he
 Build image local để test:
 
 ```powershell
-cd .\cloud\w8\day-c\challenge\app
+cd .\cloud\w8\lab\challenge\app
 docker build -t w8-k8s-challenge-web:local .
 docker run -d --name w8-web-test -p 8088:80 w8-k8s-challenge-web:local
 ```
@@ -1017,7 +1017,7 @@ Với challenge nhanh, có thể dùng hướng đơn giản.
 Lệnh local:
 
 ```powershell
-cd .\cloud\w8\day-c\challenge\app
+cd .\cloud\w8\lab\challenge\app
 docker build -t w8-k8s-challenge-web:local .
 minikube image load w8-k8s-challenge-web:local
 kubectl apply -f ..\k8s\deployment.yaml
@@ -1151,7 +1151,7 @@ README nên trả lời:
 
 ## 13. Việc bạn nên làm ngay
 
-1. Tạo folder `cloud/w8/day-c/challenge`.
+1. Tạo folder `cloud/w8/lab/challenge`.
 2. Tạo Dockerfile + nginx.conf.
 3. Test Docker local.
 4. Tạo Deployment/Service/HPA YAML.

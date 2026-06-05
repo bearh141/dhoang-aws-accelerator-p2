@@ -17,7 +17,7 @@ This keeps the challenge focused on the required platform work:
 Build and test Docker image:
 
 ```powershell
-cd .\cloud\w8\day-c\challenge\app
+cd .\cloud\w8\lab\challenge\app
 docker build -t w8-k8s-challenge-web:local .
 docker run -d --name w8-web-test -p 8088:80 w8-k8s-challenge-web:local
 ```
@@ -114,7 +114,7 @@ Title found: W8 K8s on AWS Challenge
 Terraform scaffold is ready in:
 
 ```text
-cloud/w8/day-c/challenge/terraform/
+cloud/w8/lab/challenge/terraform/
 ```
 
 Validated commands:
