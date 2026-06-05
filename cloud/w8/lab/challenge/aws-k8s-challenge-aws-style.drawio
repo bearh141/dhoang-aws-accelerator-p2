@@ -1,0 +1,138 @@
+<mxfile host="app.diagrams.net" modified="2026-06-05T00:00:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="aws-k8s-challenge-aws-style" name="AWS Style">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="950" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="aws-cloud" value="AWS Cloud" style="swimlane;whiteSpace=wrap;html=1;rounded=0;startSize=34;fillColor=#FFFFFF;strokeColor=#232F3E;fontColor=#172033;fontSize=17;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="40" width="1540" height="840" as="geometry" />
+        </mxCell>
+        <mxCell id="aws-logo" value="aws" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#232F3E;strokeColor=#232F3E;fontColor=#FFFFFF;fontSize=14;fontStyle=1;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="0" y="0" width="44" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="title" value="Terraform 1-click deploy Kubernetes app on EC2" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=26;fontStyle=1;fontColor=#172033;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="390" y="30" width="760" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="user-icon" value="" style="shape=mxgraph.aws4.user;fillColor=#1D70B8;strokeColor=#1D70B8;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="50" y="315" width="58" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="user-label" value="User Browser&#xa;HTTP request" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=13;fontColor=#172033;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="20" y="380" width="120" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="alb-icon" value="" style="shape=mxgraph.aws4.application_load_balancer;fillColor=#4D9DE0;strokeColor=#147EBA;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="210" y="300" width="88" height="88" as="geometry" />
+        </mxCell>
+        <mxCell id="alb-label" value="Application&#xa;Load Balancer&#xa;HTTP :80" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=13;fontColor=#172033;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="190" y="395" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tg-icon" value="" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#2F80ED;strokeColor=#1A5FB4;fontColor=#FFFFFF;fontSize=20;fontStyle=1;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="390" y="307" width="74" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="tg-symbol" value="TG" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=22;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="402" y="326" width="50" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="tg-label" value="Target Group&#xa;EC2 :30080&#xa;/healthz" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=13;fontColor=#172033;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="360" y="395" width="140" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="ec2-area" value="Amazon EC2 Instance - Ubuntu 22.04" style="swimlane;whiteSpace=wrap;html=1;rounded=0;startSize=34;fillColor=#F3F4F8;strokeColor=#AAB4C3;fontColor=#172033;fontSize=15;fontStyle=1;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="560" y="125" width="850" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="ec2-badge" value="EC2" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9900;strokeColor=#D86613;fontColor=#FFFFFF;fontSize=14;fontStyle=1;" vertex="1" parent="ec2-area">
+          <mxGeometry x="18" y="14" width="50" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="bootstrap" value="user-data.sh&#xa;install Docker + kubectl + minikube&#xa;build image + apply manifests" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#B8860B;fontColor=#172033;fontSize=13;align=left;spacingLeft=12;arcSize=8;" vertex="1" parent="ec2-area">
+          <mxGeometry x="70" y="80" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="docker" value="Docker Engine&#xa;minikube driver" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E9F7FF;strokeColor=#1976D2;fontColor=#172033;fontSize=13;fontStyle=1;arcSize=8;" vertex="1" parent="ec2-area">
+          <mxGeometry x="85" y="220" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="image" value="Docker image&#xa;w8-k8s-challenge-web:local" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#52627A;fontColor=#172033;fontSize=12;arcSize=8;" vertex="1" parent="ec2-area">
+          <mxGeometry x="295" y="220" width="190" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="k8s-area" value="minikube Kubernetes Cluster" style="swimlane;whiteSpace=wrap;html=1;rounded=0;startSize=34;fillColor=#EEF3FF;strokeColor=#326CE5;fontColor=#172033;fontSize=15;fontStyle=1;" vertex="1" parent="ec2-area">
+          <mxGeometry x="445" y="80" width="360" height="450" as="geometry" />
+        </mxCell>
+        <mxCell id="k8s-badge" value="K8s" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#326CE5;strokeColor=#2453B3;fontColor=#FFFFFF;fontSize=14;fontStyle=1;" vertex="1" parent="k8s-area">
+          <mxGeometry x="18" y="12" width="52" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-icon" value="" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#2F80ED;strokeColor=#1A5FB4;" vertex="1" parent="k8s-area">
+          <mxGeometry x="40" y="88" width="74" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-text" value="SVC" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=18;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="k8s-area">
+          <mxGeometry x="52" y="104" width="50" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="svc-label" value="Service&#xa;NodePort 30080" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#172033;" vertex="1" parent="k8s-area">
+          <mxGeometry x="20" y="160" width="120" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-icon" value="" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#6F42C1;strokeColor=#54319B;" vertex="1" parent="k8s-area">
+          <mxGeometry x="215" y="88" width="74" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-text" value="DEP" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=18;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="k8s-area">
+          <mxGeometry x="227" y="104" width="50" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy-label" value="Deployment&#xa;replicas: 2" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;fontSize=12;fontColor=#172033;" vertex="1" parent="k8s-area">
+          <mxGeometry x="190" y="160" width="130" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="hpa" value="HPA&#xa;2 - 5 Pods&#xa;CPU 70%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#C62828;fontColor=#172033;fontSize=12;fontStyle=1;arcSize=8;" vertex="1" parent="k8s-area">
+          <mxGeometry x="205" y="230" width="95" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="pod-box" value="POD replicas" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#C7D9F1;strokeColor=#52627A;fontColor=#172033;fontSize=14;fontStyle=1;" vertex="1" parent="k8s-area">
+          <mxGeometry x="40" y="255" width="125" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="pod1" value="Pod 1&#xa;Nginx" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#326CE5;fontColor=#172033;fontSize=12;" vertex="1" parent="k8s-area">
+          <mxGeometry x="72" y="275" width="70" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="pod2" value="Pod 2&#xa;Nginx" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#326CE5;fontColor=#172033;fontSize=12;" vertex="1" parent="k8s-area">
+          <mxGeometry x="72" y="330" width="70" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ports-note" value="Port flow&#xa;ALB :80 -&gt; EC2 :30080&#xa;Service :80 -&gt; Pod :80&#xa;Health check: /healthz" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F9FC;strokeColor=#7D8CA3;fontColor=#172033;fontSize=13;align=left;spacingLeft=12;arcSize=8;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="585" y="755" width="350" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="sg-note" value="Security Groups&#xa;ALB SG allows Internet :80&#xa;EC2 SG allows :30080 only from ALB SG&#xa;SSH :22 for debugging" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F9FC;strokeColor=#7D8CA3;fontColor=#172033;fontSize=13;align=left;spacingLeft=12;arcSize=8;" vertex="1" parent="aws-cloud">
+          <mxGeometry x="1015" y="755" width="360" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="e-user-alb" value="HTTP :80" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2.5;strokeColor=#232F3E;fontSize=12;" edge="1" parent="aws-cloud" source="user-icon" target="alb-icon">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-alb-tg" value="listener forwards" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2.5;strokeColor=#232F3E;fontSize=12;" edge="1" parent="aws-cloud" source="alb-icon" target="tg-icon">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-tg-ec2" value="HTTP :30080" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2.5;strokeColor=#232F3E;fontSize=12;" edge="1" parent="aws-cloud" source="tg-icon" target="ec2-area">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ec2-svc" value="NodePort" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2.5;strokeColor=#232F3E;fontSize=12;" edge="1" parent="ec2-area" target="svc-icon">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-20" y="223" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="20" y="223" />
+              <mxPoint x="485" y="223" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-bootstrap-docker" value="starts" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;dashed=1;strokeWidth=2;strokeColor=#B8860B;fontSize=11;" edge="1" parent="ec2-area" source="bootstrap" target="docker">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-docker-image" value="builds" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;dashed=1;strokeWidth=2;strokeColor=#B8860B;fontSize=11;" edge="1" parent="ec2-area" source="docker" target="image">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-image-k8s" value="minikube image load" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;dashed=1;strokeWidth=2;strokeColor=#B8860B;fontSize=11;" edge="1" parent="ec2-area" source="image" target="k8s-area">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-svc-pod" value="routes traffic" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;strokeColor=#2E7D32;fontSize=11;" edge="1" parent="k8s-area" source="svc-icon" target="pod-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-deploy-pod" value="creates / heals" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;strokeColor=#6F42C1;fontSize=11;" edge="1" parent="k8s-area" source="deploy-icon" target="pod-box">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="252" y="215" />
+              <mxPoint x="105" y="215" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-hpa-deploy" value="scales" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;strokeColor=#C62828;fontSize=11;" edge="1" parent="k8s-area" source="hpa" target="deploy-icon">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
