@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: restaurant-web
+spec:
+  type: NodePort
+  selector:
+    app: restaurant-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      nodePort: 30080

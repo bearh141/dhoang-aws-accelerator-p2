@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restaurant-web
+  labels:
+    app: restaurant-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: restaurant-web
+  template:
+    metadata:
+      labels:
+        app: restaurant-web
+    spec:
+      containers:
+        - name: web
+          image: w8-k8s-challenge-web:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
