@@ -29,7 +29,7 @@ cloud/w9/lab/evidence/
 
 ## 1. ArgoCD Applications
 
-![ArgoCD Applications](evidence/01-argocd-applications.png)
+![ArgoCD Applications](evidence/01-argocd-synced-healthy.png)
 
 Ảnh này chứng minh ArgoCD đang quản lý các application cần thiết:
 
@@ -232,9 +232,10 @@ ERROR_RATE: "0"
 
 ## 10. Canary Bản Lỗi Auto-Abort
 
-![Bad Canary Auto Abort](evidence/10-bad-canary-auto-abort.png)
-![Bad Canary Auto Abort 2](evidence/10-bad-canary-auto-abort-2.png)
-![Bad Canary Auto Abort 3](evidence/10-bad-canary-auto-abort-3.png)
+![Bad Canary Auto Abort 1](evidence/02-canary-auto-abort-1.png)
+![Bad Canary Auto Abort 2](evidence/02-canary-auto-abort-2.png)
+![Bad Canary Auto Abort 3](evidence/02-canary-auto-abort-3.png)
+![Bad Canary Auto Abort 4](evidence/02-canary-auto-abort-4.png)
 
 Các ảnh này chứng minh bản backend lỗi đã bị tự động abort.
 
