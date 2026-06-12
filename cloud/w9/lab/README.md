@@ -86,6 +86,7 @@ cloud/w9/lab/
 | --- | --- |
 | `root` | App-of-apps root Application |
 | `web` | Deploys workload and observability resources from `k8s/` |
+| `api` | Deploys the Lab 3 API from `k8s-api/` |
 | `kube-prometheus-stack` | Installs Prometheus, Grafana, Alertmanager, and operators |
 | `argo-rollouts` | Installs Argo Rollouts controller and CRDs |
 
@@ -97,8 +98,19 @@ The main workload and challenge resources are defined in:
 gitops/k8s/web.yaml
 ```
 
+The Lab 3 API resources are defined in:
+
+```text
+gitops/k8s-api/api.yaml
+gitops/k8s-api/servicemonitor.yaml
+gitops/argocd/apps/api.yaml
+```
+
 Important resources:
 
+- `Rollout/api`
+- `Service/api`
+- `ServiceMonitor/api`
 - `Rollout/backend`
 - `Rollout/frontend`
 - `Service/backend`
@@ -178,6 +190,20 @@ Check demo resources:
 
 ```powershell
 kubectl -n demo get rollouts.argoproj.io,svc,servicemonitor,prometheusrule,analysistemplate,pods
+```
+
+Check the Lab 3 API:
+
+```powershell
+kubectl -n argocd get app api
+kubectl -n demo get rollout api,svc api,servicemonitor api
+kubectl -n demo get pods -l app=api
+```
+
+Verify that Prometheus can see the API metric:
+
+```promql
+flask_http_request_total{namespace="demo"}
 ```
 
 Check backend rollout:
@@ -262,4 +288,3 @@ Expected final state:
 web Synced Healthy
 backend Phase: Healthy
 ```
-

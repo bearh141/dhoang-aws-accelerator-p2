@@ -7,6 +7,7 @@ Tài liệu này ghi lại bằng chứng cho lab/challenge W9: GitOps, quan sá
 | Yêu cầu | Trạng thái | Bằng chứng |
 | --- | --- | --- |
 | Deploy bằng GitOps qua ArgoCD | Đạt | ArgoCD quản lý `root`, `web`, `kube-prometheus-stack`, `argo-rollouts` |
+| API riêng theo Lab 3 | Đạt | Có ArgoCD Application `api`, `k8s-api/`, Rollout `api`, Service `api`, ServiceMonitor `api` |
 | Cài Prometheus/Grafana/Alertmanager bằng GitOps | Đạt | Các pod monitoring đang Running |
 | Cài Argo Rollouts bằng GitOps | Đạt | Pod Argo Rollouts controller đang Running |
 | Ứng dụng có metrics | Đạt | Backend expose endpoint `/metrics` |
@@ -34,6 +35,7 @@ cloud/w9/lab/evidence/
 
 - `root`
 - `web`
+- `api`
 - `kube-prometheus-stack`
 - `argo-rollouts`
 
@@ -74,12 +76,71 @@ Controller này cần thiết để xử lý các resource:
 
 - `Rollout/backend`
 - `Rollout/frontend`
+- `Rollout/api`
 - `Service/backend`
 - `Service/frontend`
+- `Service/api`
 - `ServiceMonitor/backend`
+- `ServiceMonitor/api`
 - `PrometheusRule/backend-slo-alerts`
 - `AnalysisTemplate/backend-error-rate`
 - Pod backend/frontend
+
+## 4b. API Riêng Theo Đúng Lab 3
+
+Phần này bổ sung đúng yêu cầu Lab 3 trong đề: tạo API riêng thay vì chỉ gộp vào app `web/backend`.
+
+Các file đã tạo:
+
+```text
+cloud/w9/lab/gitops/app/api/app.py
+cloud/w9/lab/gitops/app/api/Dockerfile
+cloud/w9/lab/gitops/k8s-api/api.yaml
+cloud/w9/lab/gitops/k8s-api/servicemonitor.yaml
+cloud/w9/lab/gitops/argocd/apps/api.yaml
+```
+
+Lệnh kiểm tra:
+
+```powershell
+kubectl -n argocd get app api
+kubectl -n demo get rollout api
+kubectl -n demo get svc api
+kubectl -n demo get servicemonitor api
+kubectl -n demo get pods -l app=api
+```
+
+Kết quả đã xác nhận:
+
+```text
+api    Synced    Healthy
+rollout/api    4/4 available
+service/api    8080/TCP
+servicemonitor/api
+api pods       Running
+```
+
+Prometheus query đã có dữ liệu:
+
+```promql
+flask_http_request_total{namespace="demo"}
+```
+
+Kết quả đã xác nhận Prometheus thấy metric từ API:
+
+```text
+job="api"
+service="api"
+namespace="demo"
+status="200"
+```
+
+Ảnh nên bổ sung nếu cần nộp sát đề Lab 3:
+
+```text
+evidence/04b-api-application-healthy.png
+evidence/04c-api-prometheus-metric.png
+```
 
 ## 5. Web Application Running
 
@@ -313,4 +374,3 @@ Git change
   -> Alertmanager gửi email
   -> rollback bằng Git
 ```
-
