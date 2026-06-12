@@ -1,26 +1,26 @@
-# W9 Evidence - GitOps, Observability, Canary, and Alerting
+# W9 Evidence - GitOps, Observability, Canary và Alert Email
 
-This document records the evidence for the W9 lab and the "Ship Smartly" challenge.
+Tài liệu này ghi lại bằng chứng cho lab/challenge W9: GitOps, quan sát hệ thống, SLO alert, canary auto-abort, rollback và gửi cảnh báo qua email.
 
-## Project Result
+## Kết Quả Dự Án
 
-| Requirement | Status | Evidence |
+| Yêu cầu | Trạng thái | Bằng chứng |
 | --- | --- | --- |
-| GitOps deployment with ArgoCD | Passed | ArgoCD manages `root`, `web`, `kube-prometheus-stack`, and `argo-rollouts` |
-| Prometheus/Grafana/Alertmanager installed by GitOps | Passed | Monitoring pods are running |
-| Argo Rollouts installed by GitOps | Passed | Rollouts controller pods are running |
-| Application exposes metrics | Passed | Backend exposes `/metrics` |
-| Prometheus scrapes application metrics | Passed | Prometheus query returns backend metrics |
-| SLO alert exists | Passed | `BackendHighErrorRate` rule is visible in Prometheus |
-| Alert fires and sends email | Passed | Prometheus alert is firing and email is received |
-| Good canary release succeeds | Passed | AnalysisRuns are successful and rollout becomes healthy |
-| Bad canary release auto-aborts | Passed | AnalysisRun fails and rollout is aborted |
-| Rollback is done through Git | Passed | `git revert` evidence is captured |
-| Final application state restored | Passed | Backend was restored to `ERROR_RATE=0`, and ArgoCD returned to `Synced / Healthy` |
+| Deploy bằng GitOps qua ArgoCD | Đạt | ArgoCD quản lý `root`, `web`, `kube-prometheus-stack`, `argo-rollouts` |
+| Cài Prometheus/Grafana/Alertmanager bằng GitOps | Đạt | Các pod monitoring đang Running |
+| Cài Argo Rollouts bằng GitOps | Đạt | Pod Argo Rollouts controller đang Running |
+| Ứng dụng có metrics | Đạt | Backend expose endpoint `/metrics` |
+| Prometheus scrape được metrics của app | Đạt | Prometheus query trả về metrics backend |
+| Có SLO alert | Đạt | Rule `BackendHighErrorRate` hiển thị trong Prometheus |
+| Alert firing và gửi email | Đạt | Có ảnh alert firing và email nhận được |
+| Canary bản tốt chạy thành công | Đạt | AnalysisRun Successful, Rollout Healthy |
+| Canary bản lỗi tự abort | Đạt | AnalysisRun Failed, RolloutAborted |
+| Rollback bằng Git | Đạt | Có bằng chứng `git revert` |
+| Trạng thái cuối đã restore | Đạt | Backend đã đưa về `ERROR_RATE=0`, ArgoCD về `Synced / Healthy` |
 
-## Evidence Files
+## Thư Mục Ảnh
 
-All screenshots are stored in:
+Tất cả ảnh bằng chứng được lưu trong:
 
 ```text
 cloud/w9/lab/evidence/
@@ -30,22 +30,22 @@ cloud/w9/lab/evidence/
 
 ![ArgoCD Applications](evidence/01-argocd-applications.png)
 
-This screenshot proves that ArgoCD is managing the required applications:
+Ảnh này chứng minh ArgoCD đang quản lý các application cần thiết:
 
 - `root`
 - `web`
 - `kube-prometheus-stack`
 - `argo-rollouts`
 
-The `root` application follows the app-of-apps pattern and creates the child applications from `argocd/apps`.
+`root` là application gốc theo mô hình app-of-apps. Nó tự tạo các application con từ thư mục `argocd/apps`.
 
 ## 2. Monitoring Stack Running
 
 ![Monitoring Pods Running](evidence/02-monitoring-pods-running.png)
 
-This screenshot proves that the monitoring stack is running in the `monitoring` namespace.
+Ảnh này chứng minh monitoring stack đang chạy trong namespace `monitoring`.
 
-Expected components:
+Các thành phần cần có:
 
 - Alertmanager
 - Grafana
@@ -58,9 +58,9 @@ Expected components:
 
 ![Argo Rollouts Controller](evidence/03-argo-rollouts-controller.png)
 
-This screenshot proves that the Argo Rollouts controller is running.
+Ảnh này chứng minh Argo Rollouts controller đang chạy.
 
-The controller is required to process:
+Controller này cần thiết để xử lý các resource:
 
 - `Rollout`
 - `AnalysisTemplate`
@@ -70,7 +70,7 @@ The controller is required to process:
 
 ![Demo Resources](evidence/04-demo-resources.png)
 
-This screenshot proves that the `demo` namespace contains the core resources required by the challenge:
+Ảnh này chứng minh namespace `demo` có đủ các resource chính của bài:
 
 - `Rollout/backend`
 - `Rollout/frontend`
@@ -79,23 +79,23 @@ This screenshot proves that the `demo` namespace contains the core resources req
 - `ServiceMonitor/backend`
 - `PrometheusRule/backend-slo-alerts`
 - `AnalysisTemplate/backend-error-rate`
-- backend/frontend pods
+- Pod backend/frontend
 
 ## 5. Web Application Running
 
 ![Frontend Web Running](evidence/05-frontend-web-running.png)
 
-This screenshot proves that the demo web application is reachable and can call the backend service.
+Ảnh này chứng minh web app có thể truy cập được và có thể gọi backend service.
 
-The frontend is not the main focus of the challenge. It is used to generate user-facing requests to the backend.
+Frontend không phải trọng tâm chính của challenge. Frontend chỉ dùng để tạo request đến backend, từ đó backend sinh metrics cho Prometheus.
 
 ## 6. Backend Metrics Endpoint
 
 ![Backend Metrics](evidence/06-backend-metrics.png)
 
-This screenshot proves that the backend exposes Prometheus-format metrics.
+Ảnh này chứng minh backend expose metrics theo định dạng Prometheus.
 
-Important metrics:
+Các metric quan trọng:
 
 ```text
 gitops_demo_requests_total
@@ -103,21 +103,21 @@ gitops_demo_http_requests_total
 gitops_demo_build_info
 ```
 
-The challenge uses `gitops_demo_http_requests_total` to calculate the backend error rate.
+Challenge dùng metric `gitops_demo_http_requests_total` để tính error rate của backend.
 
 ## 7. Prometheus Query
 
 ![Prometheus Query Metrics](evidence/07-prometheus-query-metrics.png)
 
-This screenshot proves that Prometheus can scrape and query backend metrics.
+Ảnh này chứng minh Prometheus scrape và query được metrics từ backend.
 
-Main metric:
+Metric chính:
 
 ```promql
 gitops_demo_http_requests_total
 ```
 
-The SLO/error-rate query is based on:
+Query tính error rate/SLO:
 
 ```promql
 (sum(increase(gitops_demo_http_requests_total{namespace="demo",route="/api/order",status=~"5.."}[1m])) or vector(0))
@@ -129,70 +129,70 @@ clamp_min((sum(increase(gitops_demo_http_requests_total{namespace="demo",route="
 
 ![Prometheus Alert Rule](evidence/08-prometheus-alert-rule.png)
 
-This screenshot proves that the SLO alert rule exists in Prometheus.
+Ảnh này chứng minh alert rule theo SLO đã tồn tại trong Prometheus.
 
-Alert name:
+Tên alert:
 
 ```text
 BackendHighErrorRate
 ```
 
-SLO rule:
+SLO:
 
 ```text
-/api/order error rate must stay below 5%
+Error rate của /api/order phải nhỏ hơn 5%
 ```
 
-The alert fires when the error rate is greater than `0.05` for `1m`.
+Alert sẽ firing khi error rate lớn hơn `0.05` liên tục trong `1m`.
 
-## 9. Good Canary Release
+## 9. Canary Bản Tốt
 
 ![Good Canary Analysis Pass 1](evidence/09-good-canary-analysis-pass-1.png)
 ![Good Canary Analysis Pass 2](evidence/09-good-canary-analysis-pass-2.png)
 ![Good Canary Analysis Pass 3](evidence/09-good-canary-analysis-pass-3.png)
 ![Good Canary Analysis Pass 4](evidence/09-good-canary-analysis-pass-4.png)
 
-These screenshots prove that a healthy backend release passes canary analysis.
+Các ảnh này chứng minh bản backend tốt đã pass canary analysis.
 
-Expected result:
+Kết quả mong đợi:
 
 ```text
 AnalysisRun Successful
 Rollout Healthy
 RolloutCompleted
-Stable ReplicaSet updated to the new version
+Stable ReplicaSet chuyển sang bản mới
 ```
 
-This happens when the backend is configured with:
+Trường hợp này xảy ra khi backend được cấu hình:
 
 ```yaml
 ERROR_RATE: "0"
 ```
 
-## 10. Bad Canary Auto-Abort
+## 10. Canary Bản Lỗi Auto-Abort
 
 ![Bad Canary Auto Abort](evidence/10-bad-canary-auto-abort.png)
 ![Bad Canary Auto Abort 2](evidence/10-bad-canary-auto-abort-2.png)
 ![Bad Canary Auto Abort 3](evidence/10-bad-canary-auto-abort-3.png)
 
-These screenshots prove that a bad backend release is automatically aborted.
+Các ảnh này chứng minh bản backend lỗi đã bị tự động abort.
 
-Expected result:
+Kết quả mong đợi:
 
 ```text
 AnalysisRun Failed
 RolloutAborted
 Rollout Phase: Degraded
-Stable ReplicaSet remains on the previous healthy version
+Stable ReplicaSet vẫn giữ bản healthy trước đó
 ```
 
-This happens when the backend is configured with:
+Trường hợp này xảy ra khi backend được cấu hình:
 
 ```yaml
 ERROR_RATE: "0.5"
 ```
 
-The bad version generates too many HTTP 500 responses, causing the Prometheus error-rate query to exceed the SLO threshold.
+Bản lỗi tạo quá nhiều HTTP 500, làm Prometheus query tính error rate vượt ngưỡng SLO.
 
 ## 11. Git Revert Rollback
 
@@ -201,9 +201,9 @@ The bad version generates too many HTTP 500 responses, causing the Prometheus er
 ![Git Revert Rollback 3](evidence/11-git-revert-rollback-3.png)
 ![Git Revert Rollback 4](evidence/11-git-revert-rollback-4.png)
 
-These screenshots prove that rollback is done through Git.
+Các ảnh này chứng minh rollback được thực hiện bằng Git, không sửa tay trực tiếp trên cluster.
 
-Rollback command pattern:
+Mẫu lệnh rollback:
 
 ```powershell
 git log --oneline
@@ -211,38 +211,38 @@ git revert <bad-commit-id> --no-edit
 git push
 ```
 
-After the revert is pushed, ArgoCD syncs the cluster back to the desired state from Git.
+Sau khi commit revert được push lên GitHub, ArgoCD sync cluster về trạng thái mong muốn trong Git.
 
-## 12. Alert Firing and Email Received
+## 12. Alert Firing và Email Nhận Được
 
 ![Prometheus Alert Firing](evidence/12b-prometheus-alert-firing.png)
 ![Email Alert Received](evidence/12a-email-alert-received.png)
 ![Email Alert Received 2](evidence/12c-email-alert-received.png)
 
-These screenshots prove that:
+Các ảnh này chứng minh:
 
-- `BackendHighErrorRate` reached the firing state.
-- Alertmanager routed the alert to the email receiver.
-- The alert email was received successfully.
+- Alert `BackendHighErrorRate` đã chuyển sang trạng thái firing.
+- Alertmanager route alert đến email receiver.
+- Email cảnh báo đã được nhận thành công.
 
-The email receiver is configured in:
+Email receiver được cấu hình trong:
 
 ```text
 cloud/w9/lab/gitops/argocd/apps/kube-prometheus-stack.yaml
 ```
 
-The SMTP password is stored in a Kubernetes Secret and is not committed to Git.
+SMTP password được lưu trong Kubernetes Secret và không được commit lên Git.
 
-## 13. Final Healthy State
+## 13. Trạng Thái Cuối Healthy
 
-After demonstrating the bad canary and email alert, the backend was restored to a healthy configuration:
+Sau khi demo bản lỗi và email alert, backend đã được restore về cấu hình healthy:
 
 ```yaml
 VERSION: "v1.8.0"
 ERROR_RATE: "0"
 ```
 
-Final verification commands:
+Lệnh kiểm tra cuối:
 
 ```powershell
 kubectl -n argocd get app web
@@ -250,7 +250,7 @@ kubectl -n demo get rollout backend
 kubectl -n demo describe rollout backend
 ```
 
-Expected final state:
+Kết quả mong đợi:
 
 ```text
 web    Synced    Healthy
@@ -258,15 +258,15 @@ backend Phase: Healthy
 Stable RS: 66dd8ffb9f
 ```
 
-Optional screenshot name if included later:
+Nếu cần bổ sung ảnh trạng thái cuối, đặt tên:
 
 ```text
 evidence/13-final-web-synced-healthy.png
 ```
 
-## Verification Commands
+## Lệnh Kiểm Tra Lại
 
-Use these commands to reproduce the evidence:
+Dùng các lệnh sau để tái kiểm chứng:
 
 ```powershell
 kubectl -n argocd get applications
@@ -278,39 +278,39 @@ kubectl -n demo describe rollout backend
 kubectl -n monitoring get secret alertmanager-smtp
 ```
 
-## Security Note
+## Ghi Chú Bảo Mật
 
-Do not commit the real SMTP secret file:
+Không commit file secret thật:
 
 ```text
 cloud/w9/lab/gitops/k8s/alertmanager-smtp-secret.yaml
 ```
 
-Only the example file should be committed:
+Chỉ commit file mẫu:
 
 ```text
 cloud/w9/lab/gitops/k8s/alertmanager-smtp-secret.example.yaml
 ```
 
-The example file must keep a placeholder value:
+File mẫu phải giữ giá trị placeholder:
 
 ```yaml
 smtp-password: REPLACE_WITH_GMAIL_APP_PASSWORD
 ```
 
-## Summary
+## Tóm Tắt Luồng Đã Chứng Minh
 
-This evidence set demonstrates the full W9 challenge flow:
+Bộ evidence này chứng minh đầy đủ luồng challenge W9:
 
 ```text
 Git change
   -> ArgoCD sync
   -> Rollout canary
-  -> Prometheus metric analysis
-  -> good version promoted
-  -> bad version auto-aborted
-  -> Prometheus alert fired
-  -> Alertmanager sent email
-  -> rollback performed through Git
+  -> Prometheus phân tích metric
+  -> bản tốt được promote
+  -> bản lỗi bị auto-abort
+  -> Prometheus alert firing
+  -> Alertmanager gửi email
+  -> rollback bằng Git
 ```
 
