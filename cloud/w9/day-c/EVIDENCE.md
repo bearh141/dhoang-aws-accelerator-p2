@@ -1,151 +1,176 @@
-# W9 Day C Evidence - CloudWatch CPU Alarm Email Alert
+# Evidence - W9 Day C: CloudWatch CPU Alarm gửi Email qua SNS
 
-Tài liệu này ghi lại các ảnh cần chụp để nộp bài CloudWatch Agent và CPU Alarm gửi email qua SNS.
+File này tổng hợp bằng chứng cho bài lab **CPU Alarm -> Email Alert via SNS** và **Installing the CloudWatch Agent on EC2**.
 
-## Checklist Evidence
-
-| Mục | Ảnh cần chụp | Mục tiêu |
-| --- | --- | --- |
-| 1 | `01-terraform-apply.png` | Terraform apply thành công |
-| 2 | `02-ec2-running.png` | EC2 instance đang Running |
-| 3 | `03-iam-role.png` | EC2 có IAM Role gắn CloudWatch Agent policy |
-| 4 | `04-cloudwatch-agent-status.png` | CloudWatch Agent đang chạy trên EC2 |
-| 5 | `05-sns-topic.png` | SNS topic đã tạo |
-| 6 | `06-sns-email-confirmed.png` | Email subscription đã Confirmed |
-| 7 | `07-cloudwatch-alarm-config.png` | CloudWatch Alarm cấu hình CPU threshold |
-| 8 | `08-cpu-stress-running.png` | Đang chạy stress CPU trên EC2 |
-| 9 | `09-alarm-in-alarm.png` | Alarm chuyển sang trạng thái In alarm |
-| 10 | `10-email-alert-received.png` | Email alert nhận được từ SNS |
-
-## 1. Terraform Apply
-
-Chụp terminal sau khi chạy:
-
-```powershell
-terraform apply tfplan
-terraform output
-```
-
-Cần thấy:
-
-- EC2 instance ID.
-- SNS topic ARN.
-- Alarm name.
-- Public IP.
-
-## 2. EC2 Running
-
-Vào AWS Console:
+Các ảnh bằng chứng được lưu tại:
 
 ```text
-EC2 -> Instances
+cloud/w9/day-c/evidence/
 ```
 
-Chụp instance đang Running.
+## 1. EC2 Instance đang chạy
 
-## 3. IAM Role
+![EC2 running](evidence/ec2-running.png)
 
-Vào EC2 instance detail, chụp IAM Role đã gắn cho instance.
+Ảnh này chứng minh Terraform đã tạo EC2 instance thành công và instance đang ở trạng thái `Running`.
 
-Role cần có policy:
+Thông tin cần thấy:
 
-```text
-CloudWatchAgentServerPolicy
-AmazonSSMManagedInstanceCore
-```
+- Instance name: `w9-cloudwatch-alarm-ec2`
+- Instance state: `Running`
+- Instance type: `t3.micro`
+- Public IPv4 address dùng để SSH vào EC2
 
-## 4. CloudWatch Agent Status
+## 2. IAM Role gắn cho EC2
 
-SSH vào EC2:
+![IAM role](evidence/iam-role.png)
+
+Ảnh này chứng minh EC2 có IAM Role để CloudWatch Agent có quyền gửi metric về CloudWatch.
+
+Role cần có các policy chính:
+
+- `CloudWatchAgentServerPolicy`
+- `AmazonSSMManagedInstanceCore`
+
+Lý do cần IAM Role: EC2 không nên dùng access key hard-code. CloudWatch Agent lấy quyền tạm thời thông qua IAM Role để push metric an toàn hơn.
+
+## 3. CloudWatch Agent đang chạy trên EC2
+
+![CloudWatch Agent status](evidence/cloudwatch-agent-status.png)
+
+Ảnh này chứng minh CloudWatch Agent đã được cài và đang chạy trên EC2.
+
+Các lệnh kiểm tra:
 
 ```bash
 sudo systemctl status amazon-cloudwatch-agent --no-pager
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a status
 ```
 
-Chụp kết quả agent đang running.
+Kết quả cần thấy:
 
-## 5. SNS Topic
+- Service `amazon-cloudwatch-agent` ở trạng thái `active` hoặc `running`
+- Agent status là `running`
+- Config status là `configured`
 
-Vào AWS Console:
+## 4. SNS Topic đã được tạo
 
-```text
-SNS -> Topics
-```
+![SNS topic](evidence/sns-topic.png)
 
-Chụp topic được tạo bởi Terraform.
+Ảnh này chứng minh SNS Topic đã được tạo để nhận notification từ CloudWatch Alarm.
 
-## 6. SNS Email Subscription
-
-Vào email nhận SNS, bấm **Confirm subscription**.
-
-Sau đó vào:
+Topic dùng trong bài:
 
 ```text
-SNS -> Subscriptions
+w9-cloudwatch-alarm-cpu-alarm-topic
 ```
 
-Chụp subscription có trạng thái:
+Luồng hoạt động:
+
+```text
+CloudWatch Alarm -> SNS Topic -> Email Subscription -> Gmail
+```
+
+## 5. Email Subscription đã Confirmed
+
+![SNS email confirmed](evidence/sns-email-confirmed.png)
+
+Ảnh này chứng minh email đã xác nhận đăng ký nhận cảnh báo từ SNS.
+
+Trạng thái cần thấy:
 
 ```text
 Confirmed
 ```
 
-## 7. CloudWatch Alarm
+Nếu subscription còn `PendingConfirmation`, CloudWatch Alarm có chuyển sang `ALARM` thì email vẫn chưa nhận được.
 
-Vào:
+## 6. CloudWatch Alarm được cấu hình đúng
 
-```text
-CloudWatch -> Alarms
-```
+![CloudWatch alarm config](evidence/cloudwatch-alarm-config.png)
 
-Chụp alarm CPU.
+Ảnh này chứng minh alarm đã được cấu hình theo yêu cầu đề bài.
 
-Cần thấy:
+Cấu hình chính:
 
 - Metric: `CPUUtilization`
 - Namespace: `AWS/EC2`
-- Threshold: lớn hơn 80% hoặc threshold bạn cấu hình
-- Action: gửi tới SNS topic
+- Condition: CPU lớn hơn `80%`
+- Period: `5 minutes`
+- Action: gửi notification đến SNS Topic
 
-## 8. CPU Stress Test
+Ý nghĩa: Khi CPU của EC2 vượt ngưỡng 80%, CloudWatch sẽ đổi trạng thái alarm và kích hoạt SNS gửi email.
 
-SSH vào EC2 và chạy:
+## 7. Chạy CPU Stress Test trên EC2
+
+![CPU stress running](evidence/cpu-stress-running.png)
+
+Ảnh này chứng minh đã tạo tải CPU để test alarm.
+
+Script chạy trên EC2:
+
+```bash
+./stress-cpu.sh
+```
+
+Nội dung chính của script:
 
 ```bash
 stress-ng --cpu 2 --timeout 8m --metrics-brief
 ```
 
-Chụp terminal đang chạy stress.
+Lý do dùng `stress-ng`: tạo tải CPU cao trong vài phút để metric `CPUUtilization` vượt ngưỡng alarm.
 
-## 9. Alarm In Alarm
+## 8. CloudWatch Alarm chuyển sang In alarm
 
-Sau vài phút, quay lại CloudWatch Alarm.
+![Alarm in alarm](evidence/alarm-in-alarm.png)
 
-Chụp trạng thái:
+Ảnh này là bằng chứng quan trọng nhất cho phần CloudWatch Alarm.
+
+Trạng thái cần thấy:
 
 ```text
 In alarm
 ```
 
-## 10. Email Alert Received
+Kết quả đã kiểm tra bằng CLI:
 
-Chụp email nhận được từ AWS Notification.
+```text
+State: ALARM
+Reason: CPU datapoint 99.41% greater than threshold 80%
+```
+
+Điều này chứng minh alarm hoạt động đúng sau khi EC2 bị stress CPU.
+
+## 9. Email Alert đã nhận được
+
+![Email alert received](evidence/email-alert-received.png)
+
+Ảnh này chứng minh SNS đã gửi email cảnh báo thành công.
 
 Email cần thể hiện:
 
-- Alarm name.
-- State change to `ALARM`.
-- Region.
-- Instance ID hoặc metric CPU.
+- Alarm name: `w9-cloudwatch-alarm-high-cpu`
+- State change: `OK` hoặc `INSUFFICIENT_DATA` sang `ALARM`
+- Region: `ap-southeast-1`
+- Metric: `CPUUtilization`
 
-## Cleanup Evidence
+## Kết luận
 
-Sau khi chụp xong, chạy:
+Bài lab đã đáp ứng đúng yêu cầu:
+
+- Tạo EC2 instance để làm máy cần monitoring.
+- Cài và chạy CloudWatch Agent trên EC2.
+- Tạo SNS Topic và email subscription.
+- Tạo CloudWatch Alarm theo metric CPU.
+- Stress CPU để alarm chuyển sang `ALARM`.
+- Nhận email cảnh báo từ SNS.
+
+## Cleanup
+
+Sau khi nộp bài, chạy lệnh sau để xóa tài nguyên AWS và tránh phát sinh chi phí:
 
 ```powershell
+cd D:\Download\AWS\Học\cloud\cloud\w9\day-c\terraform
 terraform destroy
 ```
-
-Chụp thêm nếu giảng viên yêu cầu chứng minh đã dọn tài nguyên.
-
