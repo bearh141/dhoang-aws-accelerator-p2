@@ -166,6 +166,46 @@ Bài lab đã đáp ứng đúng yêu cầu:
 - Stress CPU để alarm chuyển sang `ALARM`.
 - Nhận email cảnh báo từ SNS.
 
+## Evidence bổ sung - Root Account Login Alert
+
+Phần này dùng cho bài **Alert on AWS Root Account Login**.
+
+Ảnh cần chụp thêm:
+
+| Mục | Ảnh gợi ý | Nội dung cần thấy |
+| --- | --- | --- |
+| 1 | `root-cloudtrail-trail.png` | CloudTrail trail `w9-cloudwatch-alarm-root-login-trail` đang bật logging |
+| 2 | `root-cloudwatch-log-group.png` | Log Group `/aws/cloudtrail/w9-cloudwatch-alarm` nhận log từ CloudTrail |
+| 3 | `root-metric-filter.png` | Metric Filter `w9-cloudwatch-alarm-root-account-login-filter` |
+| 4 | `root-security-metric.png` | Metric `Security/RootAccountLoginCount` |
+| 5 | `root-login-alarm-config.png` | Alarm `w9-cloudwatch-alarm-root-account-login` với threshold `>= 1` |
+| 6 | `root-login-alarm-sns-action.png` | Alarm action gửi đến SNS Topic |
+
+Luồng cần giải thích khi vấn đáp:
+
+```text
+Root account login
+  -> CloudTrail ghi event
+  -> CloudWatch Logs nhận event
+  -> Metric Filter bắt userIdentity.type = Root
+  -> Tạo metric RootAccountLoginCount
+  -> CloudWatch Alarm chuyển ALARM
+  -> SNS gửi email cảnh báo
+```
+
+Filter pattern:
+
+```text
+{ $.userIdentity.type = "Root" && $.eventType != "AwsServiceEvent" }
+```
+
+Ý nghĩa:
+
+- `userIdentity.type = "Root"`: chỉ bắt sự kiện từ root account.
+- `eventType != "AwsServiceEvent"`: bỏ qua event do AWS service tự tạo.
+- Metric value là `1`: mỗi lần root login tạo ra một điểm metric.
+- Alarm threshold `>= 1`: chỉ cần root login một lần là đủ kích hoạt cảnh báo.
+
 ## Cleanup
 
 Sau khi nộp bài, chạy lệnh sau để xóa tài nguyên AWS và tránh phát sinh chi phí:

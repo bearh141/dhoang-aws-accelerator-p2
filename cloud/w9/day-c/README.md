@@ -1,30 +1,39 @@
-# W9 Day C - CloudWatch Agent and CPU Alarm Email Alert
+# W9 Day C - AWS Monitoring Alerts
 
-Bài lab này triển khai đúng yêu cầu:
+Thư mục này triển khai 2 bài monitoring trên AWS:
 
-1. Cài CloudWatch Agent trên EC2.
-2. Tạo SNS Topic và Email Subscription.
-3. Tạo CloudWatch Alarm theo CPU EC2.
-4. Khi CPU vượt ngưỡng, CloudWatch gửi cảnh báo qua SNS về email.
+1. **EC2 CPU Alarm -> Email Alert via SNS**
+2. **AWS Root Account Login Alert -> Email Alert via SNS**
 
-## Kiến Trúc
+Cả hai bài đều dùng Terraform để tạo hạ tầng và cấu hình cảnh báo.
+
+## Kiến trúc tổng quan
 
 ```text
+CPU Alarm:
 EC2 Instance
-  -> CloudWatch Agent
-  -> CloudWatch Metrics
-  -> CloudWatch Alarm: CPUUtilization > threshold
+  -> CloudWatch Metric: CPUUtilization
+  -> CloudWatch Alarm
   -> SNS Topic
-  -> Email Subscription
-  -> User Email
+  -> Email
+
+Root Login Alarm:
+AWS Account Events
+  -> CloudTrail
+  -> CloudWatch Logs
+  -> Metric Filter: RootAccountLoginCount
+  -> CloudWatch Alarm
+  -> SNS Topic
+  -> Email
 ```
 
-## Thư Mục
+## Cấu trúc thư mục
 
 ```text
 day-c/
   README.md
   EVIDENCE.md
+  evidence/
   terraform/
     versions.tf
     variables.tf
@@ -34,16 +43,32 @@ day-c/
     ec2.tf
     sns.tf
     cloudwatch.tf
+    cloudtrail-root-login.tf
     outputs.tf
     user-data.sh
 ```
 
-## Điều Kiện Cần Có
+## Thành phần được tạo
+
+Terraform tạo các tài nguyên chính sau:
+
+- EC2 instance để test CPU alarm.
+- IAM Role cho EC2 chạy CloudWatch Agent.
+- CloudWatch Agent trên EC2.
+- SNS Topic và Email Subscription.
+- CloudWatch Alarm cho `CPUUtilization`.
+- S3 bucket lưu CloudTrail log.
+- CloudTrail multi-region trail.
+- CloudWatch Log Group nhận log từ CloudTrail.
+- CloudWatch Logs Metric Filter bắt sự kiện root login.
+- CloudWatch Alarm cho root account login.
+
+## Điều kiện cần có
 
 - AWS CLI đã cấu hình bằng `aws configure`.
 - Terraform đã cài.
-- AWS account có quyền tạo EC2, IAM Role, SNS, CloudWatch Alarm.
-- Một email thật để nhận SNS alert.
+- AWS account có quyền tạo EC2, IAM, SNS, CloudWatch, CloudTrail, CloudWatch Logs và S3.
+- Một email thật để nhận cảnh báo SNS.
 
 Kiểm tra account:
 
@@ -51,7 +76,7 @@ Kiểm tra account:
 aws sts get-caller-identity
 ```
 
-## Cách Chạy
+## Cách chạy Terraform
 
 Đi vào thư mục Terraform:
 
@@ -79,9 +104,9 @@ terraform apply tfplan
 
 Sau khi apply xong, mở email và bấm **Confirm subscription** từ AWS SNS.
 
-Nếu chưa confirm subscription, SNS sẽ không gửi alert về email.
+Nếu email subscription chưa được confirm, SNS sẽ không gửi cảnh báo.
 
-## Test CPU Alarm
+## Bài 1: Test CPU Alarm
 
 SSH vào EC2:
 
@@ -89,37 +114,76 @@ SSH vào EC2:
 ssh -i .\w9-cloudwatch-alarm.pem ubuntu@<ec2_public_ip>
 ```
 
-Chạy stress CPU:
-
-```bash
-stress-ng --cpu 2 --timeout 8m --metrics-brief
-```
-
-Chờ khoảng vài phút rồi kiểm tra:
-
-- CloudWatch Alarm chuyển từ `OK` sang `In alarm`.
-- Email nhận được alert từ SNS.
-
-## Kiểm Tra CloudWatch Agent
-
-SSH vào EC2 rồi chạy:
+Kiểm tra CloudWatch Agent:
 
 ```bash
 sudo systemctl status amazon-cloudwatch-agent --no-pager
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a status
 ```
 
-CloudWatch Agent được dùng để gửi thêm metric hệ thống như memory và disk usage. CPU alarm trong bài dùng metric mặc định `AWS/EC2 CPUUtilization`.
+Chạy stress CPU:
 
-## Kiểm Tra Bằng AWS CLI
-
-Xem SNS topic:
-
-```powershell
-aws sns list-topics --region ap-southeast-1
+```bash
+./stress-cpu.sh
 ```
 
-Xem subscription:
+Hoặc:
+
+```bash
+stress-ng --cpu 2 --timeout 8m --metrics-brief
+```
+
+Kết quả cần thấy:
+
+- CloudWatch Alarm `w9-cloudwatch-alarm-high-cpu` chuyển sang `In alarm`.
+- Email nhận cảnh báo CPU từ SNS.
+
+## Bài 2: Root Account Login Alert
+
+File Terraform chính:
+
+```text
+terraform/cloudtrail-root-login.tf
+```
+
+Luồng hoạt động:
+
+1. CloudTrail ghi lại sự kiện trong AWS account.
+2. CloudTrail gửi log vào CloudWatch Logs.
+3. Metric Filter tìm sự kiện có `userIdentity.type = Root`.
+4. Metric Filter tạo metric `Security/RootAccountLoginCount`.
+5. CloudWatch Alarm kích hoạt nếu metric lớn hơn hoặc bằng `1`.
+6. Alarm gửi notification đến SNS Topic.
+7. SNS gửi email cảnh báo.
+
+Metric filter pattern:
+
+```text
+{ $.userIdentity.type = "Root" && $.eventType != "AwsServiceEvent" }
+```
+
+Ý nghĩa:
+
+- `$.userIdentity.type = "Root"`: chỉ bắt sự kiện do root account thực hiện.
+- `$.eventType != "AwsServiceEvent"`: bỏ qua các event nội bộ do AWS service tạo.
+
+Alarm condition:
+
+```text
+RootAccountLoginCount >= 1 trong 5 phút
+```
+
+Điều này nghĩa là chỉ cần root account login một lần thì alarm sẽ kích hoạt.
+
+## Kiểm tra bằng AWS CLI
+
+Xem output Terraform:
+
+```powershell
+terraform output
+```
+
+Xem SNS subscription:
 
 ```powershell
 aws sns list-subscriptions-by-topic `
@@ -127,13 +191,52 @@ aws sns list-subscriptions-by-topic `
   --region ap-southeast-1
 ```
 
-Xem alarm:
+Xem CPU alarm:
 
 ```powershell
 aws cloudwatch describe-alarms `
   --alarm-names w9-cloudwatch-alarm-high-cpu `
   --region ap-southeast-1
 ```
+
+Xem Root Login alarm:
+
+```powershell
+aws cloudwatch describe-alarms `
+  --alarm-names w9-cloudwatch-alarm-root-account-login `
+  --region ap-southeast-1
+```
+
+Xem CloudTrail:
+
+```powershell
+aws cloudtrail describe-trails `
+  --trail-name-list w9-cloudwatch-alarm-root-login-trail `
+  --region ap-southeast-1
+```
+
+## Evidence cần chụp
+
+Cho bài CPU Alarm:
+
+- EC2 instance đang `Running`.
+- IAM Role gắn vào EC2.
+- CloudWatch Agent đang `running`.
+- SNS Topic.
+- Email subscription đã `Confirmed`.
+- CPU Alarm config.
+- Terminal chạy stress CPU.
+- Alarm chuyển sang `In alarm`.
+- Email alert nhận được.
+
+Cho bài Root Login Alert:
+
+- CloudTrail trail đã tạo và đang logging.
+- CloudWatch Log Group `/aws/cloudtrail/w9-cloudwatch-alarm`.
+- Metric Filter `w9-cloudwatch-alarm-root-account-login-filter`.
+- Metric `Security/RootAccountLoginCount`.
+- Alarm `w9-cloudwatch-alarm-root-account-login`.
+- SNS action gắn vào alarm.
 
 ## Cleanup
 
@@ -143,10 +246,10 @@ Sau khi chụp evidence xong, destroy để tránh tốn phí:
 terraform destroy
 ```
 
-## Ghi Chú
+## Ghi chú bảo mật
 
-- SNS email subscription phải được confirm thủ công qua email.
-- Alarm dùng điều kiện mặc định: CPU lớn hơn threshold trong 5 phút.
-- Để test nhanh hơn, có thể giảm `cpu_alarm_period` hoặc `cpu_alarm_evaluation_periods` trong `terraform.tfvars`.
-- Không commit `.pem`, `.tfstate`, `.tfvars`, `.terraform/`, hoặc `tfplan`.
-
+- Root account gần như không nên dùng trong vận hành hằng ngày.
+- Nên bật MFA cho root account.
+- Nên dùng IAM User hoặc IAM Role cho công việc thường ngày.
+- Alert root login giúp phát hiện sớm hành vi rủi ro trong AWS account.
+- Không commit `.pem`, `.tfstate`, `.tfvars`, `.terraform/` hoặc `tfplan`.
