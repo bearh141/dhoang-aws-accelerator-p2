@@ -1,196 +1,171 @@
-# Evidence - W9 Day C: CloudWatch CPU Alarm gửi Email qua SNS
+# Evidence - W9 Day C: AWS Monitoring Alerts
 
-File này tổng hợp bằng chứng cho bài lab **CPU Alarm -> Email Alert via SNS** và **Installing the CloudWatch Agent on EC2**.
+## Thông Tin Chung
 
-Các ảnh bằng chứng được lưu tại:
+Bài lab triển khai 2 cơ chế cảnh báo trên AWS:
+
+1. **EC2 CPU Alarm -> SNS Email Alert**
+2. **AWS Root Account Login Alert -> SNS Email Alert**
+
+Thư mục ảnh bằng chứng:
 
 ```text
 cloud/w9/day-c/evidence/
 ```
 
-## 1. EC2 Instance đang chạy
+## Tóm Tắt Kết Quả
+
+| Hạng mục | Trạng thái |
+| --- | --- |
+| EC2 monitoring instance | Hoàn thành |
+| CloudWatch Agent trên EC2 | Hoàn thành |
+| SNS Topic và Email Subscription | Hoàn thành |
+| CPU Alarm gửi email khi CPU vượt 80% | Hoàn thành |
+| CloudTrail ghi log AWS account | Hoàn thành |
+| Metric Filter phát hiện root account login | Hoàn thành |
+| Root Login Alarm gửi cảnh báo qua SNS | Hoàn thành |
+
+## Danh Sách Evidence
+
+| STT | File ảnh | Nội dung chứng minh |
+| --- | --- | --- |
+| 1 | `ec2-running.png` | EC2 instance dùng cho monitoring đang chạy |
+| 2 | `iam-role.png` | EC2 có IAM Role cần thiết cho CloudWatch Agent |
+| 3 | `cloudwatch-agent-status.png` | CloudWatch Agent đã cài và đang chạy |
+| 4 | `sns-topic.png` | SNS Topic đã được tạo |
+| 5 | `sns-email-confirmed.png` | Email subscription đã được xác nhận |
+| 6 | `cloudwatch-alarm-config.png` | CPU Alarm được cấu hình đúng |
+| 7 | `cpu-stress-running.png` | Đã chạy stress CPU để test alarm |
+| 8 | `alarm-in-alarm.png` | CPU Alarm chuyển sang trạng thái `In alarm` |
+| 9 | `email-alert-received.png` | Email cảnh báo CPU đã được gửi về email |
+| 10 | `root-cloudtrail-trail.png` | CloudTrail trail cho root login alert đã bật |
+| 11 | `root-cloudwatch-log-group.png` | CloudTrail gửi log vào CloudWatch Logs |
+| 12 | `root-metric-filter.png` | Metric Filter bắt sự kiện root account login |
+| 13 | `root-security-metric.png` | Metric `RootAccountLoginCount` đã được tạo |
+| 14 | `root-login-alarm-config.png` | Root Login Alarm được cấu hình đúng |
+| 15 | `root-login-alarm-sns-action.png` | Root Login Alarm gửi notification qua SNS |
+
+## Evidence Chi Tiết
+
+### 1. EC2 Instance Đang Running
 
 ![EC2 running](evidence/ec2-running.png)
 
-Ảnh này chứng minh Terraform đã tạo EC2 instance thành công và instance đang ở trạng thái `Running`.
+Bằng chứng này cho thấy EC2 instance `w9-cloudwatch-alarm-ec2` đã được tạo và đang ở trạng thái `Running`.
 
-Thông tin cần thấy:
-
-- Instance name: `w9-cloudwatch-alarm-ec2`
-- Instance state: `Running`
-- Instance type: `t3.micro`
-- Public IPv4 address dùng để SSH vào EC2
-
-## 2. IAM Role gắn cho EC2
+### 2. IAM Role Cho EC2
 
 ![IAM role](evidence/iam-role.png)
 
-Ảnh này chứng minh EC2 có IAM Role để CloudWatch Agent có quyền gửi metric về CloudWatch.
+Bằng chứng này cho thấy EC2 đã được gắn IAM Role để CloudWatch Agent có quyền gửi metric về CloudWatch.
 
-Role cần có các policy chính:
+Các quyền chính:
 
 - `CloudWatchAgentServerPolicy`
 - `AmazonSSMManagedInstanceCore`
 
-Lý do cần IAM Role: EC2 không nên dùng access key hard-code. CloudWatch Agent lấy quyền tạm thời thông qua IAM Role để push metric an toàn hơn.
-
-## 3. CloudWatch Agent đang chạy trên EC2
+### 3. CloudWatch Agent Đang Chạy
 
 ![CloudWatch Agent status](evidence/cloudwatch-agent-status.png)
 
-Ảnh này chứng minh CloudWatch Agent đã được cài và đang chạy trên EC2.
+Bằng chứng này cho thấy CloudWatch Agent đã được cài đặt và đang hoạt động trên EC2.
 
-Các lệnh kiểm tra:
+Kết quả cần thể hiện:
 
-```bash
-sudo systemctl status amazon-cloudwatch-agent --no-pager
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a status
-```
+- Agent status: `running`
+- Config status: `configured`
 
-Kết quả cần thấy:
-
-- Service `amazon-cloudwatch-agent` ở trạng thái `active` hoặc `running`
-- Agent status là `running`
-- Config status là `configured`
-
-## 4. SNS Topic đã được tạo
+### 4. SNS Topic
 
 ![SNS topic](evidence/sns-topic.png)
 
-Ảnh này chứng minh SNS Topic đã được tạo để nhận notification từ CloudWatch Alarm.
+Bằng chứng này cho thấy SNS Topic đã được tạo để nhận notification từ CloudWatch Alarm.
 
-Topic dùng trong bài:
+Topic:
 
 ```text
 w9-cloudwatch-alarm-cpu-alarm-topic
 ```
 
-Luồng hoạt động:
-
-```text
-CloudWatch Alarm -> SNS Topic -> Email Subscription -> Gmail
-```
-
-## 5. Email Subscription đã Confirmed
+### 5. SNS Email Subscription Confirmed
 
 ![SNS email confirmed](evidence/sns-email-confirmed.png)
 
-Ảnh này chứng minh email đã xác nhận đăng ký nhận cảnh báo từ SNS.
+Bằng chứng này cho thấy email nhận cảnh báo đã xác nhận subscription thành công.
 
-Trạng thái cần thấy:
+Trạng thái cần có:
 
 ```text
 Confirmed
 ```
 
-Nếu subscription còn `PendingConfirmation`, CloudWatch Alarm có chuyển sang `ALARM` thì email vẫn chưa nhận được.
-
-## 6. CloudWatch Alarm được cấu hình đúng
+### 6. CloudWatch CPU Alarm Config
 
 ![CloudWatch alarm config](evidence/cloudwatch-alarm-config.png)
 
-Ảnh này chứng minh alarm đã được cấu hình theo yêu cầu đề bài.
-
-Cấu hình chính:
+Bằng chứng này cho thấy CPU Alarm được cấu hình theo yêu cầu:
 
 - Metric: `CPUUtilization`
 - Namespace: `AWS/EC2`
-- Condition: CPU lớn hơn `80%`
-- Period: `5 minutes`
-- Action: gửi notification đến SNS Topic
+- Threshold: CPU lớn hơn `80%`
+- Action: gửi cảnh báo đến SNS Topic
 
-Ý nghĩa: Khi CPU của EC2 vượt ngưỡng 80%, CloudWatch sẽ đổi trạng thái alarm và kích hoạt SNS gửi email.
-
-## 7. Chạy CPU Stress Test trên EC2
+### 7. CPU Stress Test
 
 ![CPU stress running](evidence/cpu-stress-running.png)
 
-Ảnh này chứng minh đã tạo tải CPU để test alarm.
+Bằng chứng này cho thấy EC2 đã được tạo tải CPU để kiểm tra alarm.
 
-Script chạy trên EC2:
-
-```bash
-./stress-cpu.sh
-```
-
-Nội dung chính của script:
+Lệnh test:
 
 ```bash
 stress-ng --cpu 2 --timeout 8m --metrics-brief
 ```
 
-Lý do dùng `stress-ng`: tạo tải CPU cao trong vài phút để metric `CPUUtilization` vượt ngưỡng alarm.
-
-## 8. CloudWatch Alarm chuyển sang In alarm
+### 8. CPU Alarm In Alarm
 
 ![Alarm in alarm](evidence/alarm-in-alarm.png)
 
-Ảnh này là bằng chứng quan trọng nhất cho phần CloudWatch Alarm.
+Bằng chứng này cho thấy CPU Alarm đã chuyển sang trạng thái `In alarm` sau khi CPU vượt ngưỡng.
 
-Trạng thái cần thấy:
-
-```text
-In alarm
-```
-
-Kết quả đã kiểm tra bằng CLI:
-
-```text
-State: ALARM
-Reason: CPU datapoint 99.41% greater than threshold 80%
-```
-
-Điều này chứng minh alarm hoạt động đúng sau khi EC2 bị stress CPU.
-
-## 9. Email Alert đã nhận được
+### 9. Email Alert Received
 
 ![Email alert received](evidence/email-alert-received.png)
 
-Ảnh này chứng minh SNS đã gửi email cảnh báo thành công.
+Bằng chứng này cho thấy SNS đã gửi email cảnh báo thành công khi CPU Alarm được kích hoạt.
 
-Email cần thể hiện:
+## Root Account Login Alert Evidence
 
-- Alarm name: `w9-cloudwatch-alarm-high-cpu`
-- State change: `OK` hoặc `INSUFFICIENT_DATA` sang `ALARM`
-- Region: `ap-southeast-1`
-- Metric: `CPUUtilization`
+### 10. CloudTrail Trail
 
-## Kết luận
+![Root CloudTrail trail](evidence/root-cloudtrail-trail.png)
 
-Bài lab đã đáp ứng đúng yêu cầu:
+Bằng chứng này cho thấy CloudTrail trail `w9-cloudwatch-alarm-root-login-trail` đã được tạo và bật logging.
 
-- Tạo EC2 instance để làm máy cần monitoring.
-- Cài và chạy CloudWatch Agent trên EC2.
-- Tạo SNS Topic và email subscription.
-- Tạo CloudWatch Alarm theo metric CPU.
-- Stress CPU để alarm chuyển sang `ALARM`.
-- Nhận email cảnh báo từ SNS.
+CloudTrail là nguồn ghi lại hoạt động trong AWS account, bao gồm sự kiện root account login.
 
-## Evidence bổ sung - Root Account Login Alert
+### 11. CloudWatch Log Group
 
-Phần này dùng cho bài **Alert on AWS Root Account Login**.
+![Root CloudWatch log group](evidence/root-cloudwatch-log-group.png)
 
-Ảnh cần chụp thêm:
+Bằng chứng này cho thấy CloudTrail gửi log vào CloudWatch Logs.
 
-| Mục | Ảnh gợi ý | Nội dung cần thấy |
-| --- | --- | --- |
-| 1 | `root-cloudtrail-trail.png` | CloudTrail trail `w9-cloudwatch-alarm-root-login-trail` đang bật logging |
-| 2 | `root-cloudwatch-log-group.png` | Log Group `/aws/cloudtrail/w9-cloudwatch-alarm` nhận log từ CloudTrail |
-| 3 | `root-metric-filter.png` | Metric Filter `w9-cloudwatch-alarm-root-account-login-filter` |
-| 4 | `root-security-metric.png` | Metric `Security/RootAccountLoginCount` |
-| 5 | `root-login-alarm-config.png` | Alarm `w9-cloudwatch-alarm-root-account-login` với threshold `>= 1` |
-| 6 | `root-login-alarm-sns-action.png` | Alarm action gửi đến SNS Topic |
-
-Luồng cần giải thích khi vấn đáp:
+Log group:
 
 ```text
-Root account login
-  -> CloudTrail ghi event
-  -> CloudWatch Logs nhận event
-  -> Metric Filter bắt userIdentity.type = Root
-  -> Tạo metric RootAccountLoginCount
-  -> CloudWatch Alarm chuyển ALARM
-  -> SNS gửi email cảnh báo
+/aws/cloudtrail/w9-cloudwatch-alarm
+```
+
+### 12. Metric Filter Root Login
+
+![Root metric filter](evidence/root-metric-filter.png)
+
+Bằng chứng này cho thấy Metric Filter đã được tạo để phát hiện root account login.
+
+Metric filter:
+
+```text
+w9-cloudwatch-alarm-root-account-login-filter
 ```
 
 Filter pattern:
@@ -199,16 +174,74 @@ Filter pattern:
 { $.userIdentity.type = "Root" && $.eventType != "AwsServiceEvent" }
 ```
 
-Ý nghĩa:
+### 13. Security Metric
 
-- `userIdentity.type = "Root"`: chỉ bắt sự kiện từ root account.
-- `eventType != "AwsServiceEvent"`: bỏ qua event do AWS service tự tạo.
-- Metric value là `1`: mỗi lần root login tạo ra một điểm metric.
-- Alarm threshold `>= 1`: chỉ cần root login một lần là đủ kích hoạt cảnh báo.
+![Root security metric](evidence/root-security-metric.png)
+
+Bằng chứng này cho thấy metric `RootAccountLoginCount` đã xuất hiện trong namespace `Security`.
+
+Metric này tăng khi có sự kiện root account login khớp với Metric Filter.
+
+### 14. Root Login Alarm Config
+
+![Root login alarm config](evidence/root-login-alarm-config.png)
+
+Bằng chứng này cho thấy CloudWatch Alarm cho root account login đã được cấu hình.
+
+Cấu hình chính:
+
+- Metric: `RootAccountLoginCount`
+- Namespace: `Security`
+- Statistic: `Sum`
+- Threshold: `>= 1`
+- Period: `5 minutes`
+
+Chỉ cần một lần root account login trong kỳ đánh giá là alarm có thể kích hoạt.
+
+### 15. Root Login Alarm SNS Action
+
+![Root login alarm SNS action](evidence/root-login-alarm-sns-action.png)
+
+Bằng chứng này cho thấy Root Login Alarm có action gửi notification đến SNS Topic.
+
+SNS Topic sau đó gửi cảnh báo về email đã subscribe.
+
+## Luồng Hoạt Động
+
+### CPU Alarm
+
+```text
+EC2 CPU vượt ngưỡng
+-> CloudWatch Alarm chuyển ALARM
+-> Alarm gửi notification đến SNS Topic
+-> SNS gửi email cảnh báo
+```
+
+### Root Account Login Alert
+
+```text
+Root account login
+-> CloudTrail ghi event
+-> CloudWatch Logs nhận event
+-> Metric Filter tạo metric RootAccountLoginCount
+-> CloudWatch Alarm chuyển ALARM
+-> Alarm gửi notification đến SNS Topic
+-> SNS gửi email cảnh báo
+```
+
+## Kết Luận
+
+Bài W9 Day C đã hoàn thành các yêu cầu chính:
+
+- Cài và kiểm tra CloudWatch Agent trên EC2.
+- Tạo CPU Alarm và gửi cảnh báo qua SNS email.
+- Tạo CloudTrail để ghi nhận sự kiện trong AWS account.
+- Tạo Metric Filter để phát hiện root account login.
+- Tạo Root Login Alarm và gửi cảnh báo qua SNS email.
 
 ## Cleanup
 
-Sau khi nộp bài, chạy lệnh sau để xóa tài nguyên AWS và tránh phát sinh chi phí:
+Sau khi nộp bài, xóa tài nguyên để tránh phát sinh chi phí:
 
 ```powershell
 cd D:\Download\AWS\Học\cloud\cloud\w9\day-c\terraform
