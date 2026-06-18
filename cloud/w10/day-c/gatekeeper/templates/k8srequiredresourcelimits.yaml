@@ -1,0 +1,35 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredresourcelimits
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredResourceLimits
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredresourcelimits
+
+        containers[container] {
+          container := input.review.object.spec.containers[_]
+        }
+
+        containers[container] {
+          container := input.review.object.spec.template.spec.containers[_]
+        }
+
+        violation[{"msg": msg}] {
+          container := containers[_]
+          not container.resources.limits.cpu
+          msg := sprintf("container %q must set resources.limits.cpu", [container.name])
+        }
+
+        violation[{"msg": msg}] {
+          container := containers[_]
+          not container.resources.limits.memory
+          msg := sprintf("container %q must set resources.limits.memory", [container.name])
+        }
